@@ -98,11 +98,11 @@ std::string Config::getModuleStr() {
 }
 
 std::string Config::getVersionStr() {
-	return "v0.0.4a";
+	return "v0.0.4c";
 }
 
 int Config::getVersionInt() {
-	return 401;
+	return 403;
 }
 
 std::string Config::getBuildStr() {
