@@ -167,7 +167,7 @@ public:
 	int unknown360; // 0x360
 	int unknown364; // 0x364
 	int unknown368; // 0x368
-	int unknown36C; // 0x36C
+	int selected_weapon_entry_ptr36C; // 0x36C
 	int unknown370; // 0x370
 	int unknown374; // 0x374
 	int unknown378; // 0x378
