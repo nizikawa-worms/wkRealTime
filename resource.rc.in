@@ -1,0 +1,28 @@
+
+1 VERSIONINFO
+FILEVERSION 0,0,4,1
+PRODUCTVERSION 0,0,4,1
+FILEOS 0x4
+FILETYPE 0x1
+{
+BLOCK "StringFileInfo"
+{
+	BLOCK "040904b0"
+	{
+		VALUE "Comments", ""
+		VALUE "CompanyName", "Nizikawa"
+		VALUE "FileDescription", "Real time network multiplayer"
+		VALUE "FileVersion", "0.0.4.1"
+		VALUE "InternalName", "wkRealTime v0.0.4a"
+		VALUE "LegalCopyright", "Nizikawa"
+		VALUE "OriginalFilename", "wkRealTime.dll"
+		VALUE "ProductName", "wkRealTime v0.0.4a"
+		VALUE "ProductVersion", "0.0.4.1"
+	}
+}
+
+BLOCK "VarFileInfo"
+{
+	VALUE "Translation", 0x0409 0x04B0  
+}
+}
