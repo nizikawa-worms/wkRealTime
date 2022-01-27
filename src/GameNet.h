@@ -15,6 +15,8 @@ struct ChatMessage {
 
 class GameNet {
 private:
+	static const int inactiveWormsInterval = 25;
+
 	static int callSendOutOfOrder(DWORD gamenet);
 	static int __stdcall hookGameNetUnknown();
 	static void hookGameNetUnknown_c(DWORD ddgame);
@@ -22,7 +24,7 @@ private:
 	static int callFifoGamenetGetEvent(int machine, size_t * msize, DWORD gamenet, int * mtype, unsigned char *data);
 	static void __stdcall injectRealtimeFifoEvents();
 	static void __stdcall gamenetmain_patch1_c(DWORD ddgame);
-	static void sendWormStates(TaskMessageFifo *fifo, CTaskTurnGame *turngame);
+	static void sendWormStates(TaskMessageFifo *fifo, CTaskTurnGame *turngame, bool sendInactiveWorms=false);
 	static void __stdcall gamenetmain_patch2_c();
 public:
 	static void install();

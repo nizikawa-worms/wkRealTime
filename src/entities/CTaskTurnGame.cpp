@@ -8,6 +8,7 @@
 #include "../TaskMessageFifo.h"
 #include "../W2App.h"
 #include "CTaskWorm.h"
+#include "../Utils.h"
 
 int (__fastcall *origTurnHandleMessage)(CTaskTurnGame * This, int EDX, CTask * sender, Constants::TaskMessage mtype, size_t size, void * data);
 int __fastcall CTaskTurnGame::hookTurnHandleMessage(CTaskTurnGame * This, int EDX, CTask * sender, Constants::TaskMessage mtype, size_t size, void * data) {
@@ -18,49 +19,45 @@ int __fastcall CTaskTurnGame::hookTurnHandleMessage(CTaskTurnGame * This, int ED
 			debugf("Start turn\n");
 			RealTime::setTurn(true);
 			if(RealTime::isActive()) {
-
+				DWORD intendedTeam = *(DWORD*)data;
 				This->traverse([&](CTask *obj, const int level) {
 					if (obj->classtype == Constants::ClassType_Task_Team) {
 						CTaskTeam *team = (CTaskTeam *) obj;
-						flagActivatingTeam = true;
-						char buff[1024];
-						memset(buff, 0, sizeof(buff));
-						*(DWORD*)buff = team->team_number_dword38;
+						if(team->team_number_dword38 != intendedTeam) {
+							flagActivatingTeam = true;
+							char buff[1024];
+							memset(buff, 0, sizeof(buff));
+							*(DWORD *) buff = team->team_number_dword38;
 
-						int first_worm_number = 0;
-						bool found = false;
-						for(auto child : team->children) {
-							CTaskWorm * worm = (CTaskWorm*)child;
-							if(!first_worm_number) first_worm_number = worm->wormnumber_dword100;
-							if(team->current_worm_number_dword48 == worm->wormnumber_dword100) {
-								found = true;
-								break;
+							bool found = team->fixCurrentWorm();
+							if (found) {
+								team->vtable8_HandleMessage(This, Constants::TaskMessage::TaskMessage_StartTurn, sizeof(buff), buff);
 							}
+							flagActivatingTeam = false;
 						}
-						if(!found) {
-							if(first_worm_number) {
-								debugf("*bugfix* Setting current worm number of team %d to %d\n", team->team_number_dword38, first_worm_number);
-								team->current_worm_number_dword48 = first_worm_number;
-								found = true;
-							} else {
-								debugf("team %d has no matching current worm\n", team->team_number_dword38);
-							}
-						}
-						if(found) {
-							team->vtable8_HandleMessage(This, Constants::TaskMessage::TaskMessage_StartTurn, sizeof(buff), buff);
-						}
-						flagActivatingTeam = false;
 					}
 				});
-
 			}
 			break;
 		}
+
+		case Constants::TaskMessage::TaskMessage_TurnStarted:
+			debugf("Turn started\n");
+			spoofTeamMessage(This, data, Constants::TaskMessage::TaskMessage_TurnStarted);
+			break;
+
 		case Constants::TaskMessage::TaskMessage_FinishTurn: {
 			debugf("Finish turn\n");
-			RealTime::setTurn(false);
+			spoofTeamMessage(This, data, Constants::TaskMessage::TaskMessage_FinishTurn);
 			break;
 		}
+
+		case Constants::TaskMessage::TaskMessage_TurnFinished:
+			debugf("Turn finished\n");
+			RealTime::setTurn(false);
+			spoofTeamMessage(This, data, Constants::TaskMessage::TaskMessage_TurnFinished);
+			break;
+
 		case Constants::TaskMessage::TaskMessage_GameState: {
 			GameState * state = (GameState*)data;
 			state->apply(This);
@@ -70,6 +67,23 @@ int __fastcall CTaskTurnGame::hookTurnHandleMessage(CTaskTurnGame * This, int ED
 	}
 
 	return ret;
+}
+
+void CTaskTurnGame::spoofTeamMessage(CTaskTurnGame *This, const void *data, Constants::TaskMessage mtype) {
+	if(RealTime::isActive()) {
+		DWORD intendedTeam = *(DWORD*)data;
+		This->traverse([&](CTask *obj, const int level) {
+			if (obj->classtype == Constants::ClassType_Task_Team) {
+				CTaskTeam *team = (CTaskTeam *) obj;
+				if(team->team_number_dword38 != intendedTeam) {
+					char buff[1024];
+					memset(buff, 0, sizeof(buff));
+					*(DWORD *) buff = team->team_number_dword38;
+					team->vtable8_HandleMessage(This, mtype, sizeof(buff), buff);
+				}
+			}
+		});
+	}
 }
 
 DWORD (__stdcall *origSetActiveWorm)();
@@ -97,16 +111,13 @@ void CTaskTurnGame::install() {
 
 	_HookDefault(TurnHandleMessage);
 	_HookDefault(SetActiveWorm);
-
-
-	//:00531F81 - game end condition check!
-	//005578CE writes 6 to game end
 }
 
-GameState::GameState() {
+GameState::GameState(CTaskTurnGame * turnGame) {
 	DWORD gameglobal = W2App::getAddrGameGlobal();
 	DWORD collisionmanager = *(DWORD*)(gameglobal + 0x528);
-	this->frame = *(DWORD*)(gameglobal + 0x5CC);
+//	this->frame = *(DWORD*)(gameglobal + 0x5CC);
+//	this->roundTimer = turnGame->round_timer_dword184;
 	this->wind = *(DWORD*)(collisionmanager + 0x230);
 }
 
@@ -114,6 +125,9 @@ bool GameState::apply(CTaskTurnGame * turngame) {
 	DWORD gameglobal = W2App::getAddrGameGlobal();
 	DWORD collisionmanager = *(DWORD*)(gameglobal + 0x528);
 //	*(DWORD*)(gameglobal + 0x5CC) = this->frame;
-//	*(DWORD*)(collisionmanager + 0x230) = this->wind;
+//	 turngame->round_timer_dword184 = this->roundTimer;
+	if(*(DWORD*)(collisionmanager + 0x230) != this->wind) {
+		turngame->vtable8_HandleMessage(turngame, Constants::TaskMessage::TaskMessage_SetWind, sizeof(this->wind), &this->wind);
+	}
 	return true;
 }

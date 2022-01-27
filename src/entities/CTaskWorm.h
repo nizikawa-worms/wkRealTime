@@ -233,7 +233,7 @@ struct WormState {
 	DWORD ropeX;
 	DWORD ropeY;
 
-
+	WormState() = delete;
 	WormState(CTaskWorm * worm);
 	bool apply(CTaskWorm* worm);
 };

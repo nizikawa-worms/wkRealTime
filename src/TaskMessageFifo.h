@@ -9,7 +9,7 @@ typedef unsigned long       DWORD;
 
 struct TaskMessageEntry {
 	DWORD totalsize_dword0;
-	DWORD dword4;
+	TaskMessageEntry * nextentry_dword4;
 	DWORD type_dword8;
 	unsigned char datac[];
 };
@@ -17,7 +17,7 @@ struct TaskMessageEntry {
 class TaskMessageFifo {
 public:
 	DWORD dword0; // maybe backing storage
-	DWORD dword4; // maybe max size / num elements
+	DWORD dword4; // maybe max size
 	DWORD size_dword8; // current size
 	DWORD dwordC; //unk
 	DWORD dword10; //maybe pointer to current data end?
@@ -30,6 +30,7 @@ public:
 
 	void printInfo();
 	void printContents();
+	void clean();
 	static void install();
 };
 

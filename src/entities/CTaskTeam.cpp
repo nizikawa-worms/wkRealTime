@@ -5,24 +5,26 @@
 #include "../Hooks.h"
 #include "../Debugf.h"
 #include "../RealTime.h"
+#include "CTaskWorm.h"
 
 int (__fastcall *origTeamHandleMessage)(CTaskTeam * This, int EDX, CTask * sender, Constants::TaskMessage mtype, size_t size, void * data);
 int __fastcall CTaskTeam::hookTeamHandleMessage(CTaskTeam * This, int EDX, CTask * sender, Constants::TaskMessage mtype, size_t size, void * data) {
-	switch(mtype) {
-		case Constants::TaskMessage_CursorMoved: {
-			////005573F1 - writing cursor XY to gameglobal
-			// bad fix for recursive teleport cursor movement
-			if(RealTime::isActive()) {
-				DWORD senderTeam  = *(DWORD*)data;
-//				DWORD posX  = *(DWORD*)((DWORD)data+4);
-//				DWORD posY  = *(DWORD*)((DWORD)data+8);
-//				debugf("Cursor moved, senderTeam: %d posX: %d posY: %d\n", senderTeam, posX, posY);
-				if(senderTeam == This->team_number_dword38) {
-					if(!This->isOwnedByMe()) return 0;
+	if(RealTime::isActive()) {
+		switch (mtype) {
+			case Constants::TaskMessage_CursorMoved: {
+				DWORD senderTeam = *(DWORD *) data;
+				if (senderTeam == This->team_number_dword38) {
+					if (!This->isOwnedByMe()) return 0;
 				}
 			}
+			break;
+			case Constants::TaskMessage_FrameFinish:
+			case Constants::TaskMessage_StartTurn:
+			case Constants::TaskMessage_FinishTurn:
+				This->fixCurrentWorm();
+			default:
+				break;
 		}
-		default: break;
 	}
 	return origTeamHandleMessage(This, EDX, sender, mtype, size, data);
 }
@@ -53,5 +55,24 @@ void CTaskTeam::install() {
 bool CTaskTeam::isOwnedByMe() {
 	char mymachine = *(char *) (W2App::getAddrDdMain() + 0xD9DC + 0x40);
 	return this->owner_byte40 == mymachine;
+}
+
+bool CTaskTeam::fixCurrentWorm() {
+	int first_worm_number = 0;
+	for (auto child : this->children) {
+		CTaskWorm *worm = (CTaskWorm *) child;
+		if (!first_worm_number) first_worm_number = worm->wormnumber_dword100;
+		if (this->current_worm_number_dword48 == worm->wormnumber_dword100) {
+			return true;
+		}
+	}
+	if (first_worm_number) {
+		debugf("*bugfix* Setting current worm number of team %d to %d\n", this->team_number_dword38, first_worm_number);
+		this->current_worm_number_dword48 = first_worm_number;
+		return true;
+	} else {
+		debugf("team %d has no matching current worm\n", this->team_number_dword38);
+		return false;
+	}
 }
 

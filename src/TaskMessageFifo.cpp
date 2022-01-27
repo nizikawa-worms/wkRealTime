@@ -12,19 +12,15 @@ void TaskMessageFifo::printInfo() {
 
 void TaskMessageFifo::printContents() {
 	TaskMessageEntry * entry = (TaskMessageEntry*) this->data_start_dword14;
-	if(!entry) {
-		debugf("empty fifo queue!\n");
-		return;
-	}
-
-	for(DWORD i=0; i < this->num_elements_dword18; i++) {
+	int i = 0;
+	while(entry) {
 		DWORD size = entry->totalsize_dword0 - 4;
-		if(entry->totalsize_dword0 == 0) break;
-		printf("\t%d: entry: 0x%08X tsize: %d size: %d, dword4: 0x%08X type: %d\n", i, (DWORD)entry, entry->totalsize_dword0, size, entry->dword4, entry->type_dword8);
+		printf("\t%d: entry: 0x%08X tsize: %d size: %d, dword4: 0x%08X type: %d\n", i, (DWORD)entry, entry->totalsize_dword0, size, entry->nextentry_dword4, entry->type_dword8);
 		if(size) {
 			Utils::hexDump("Payload", entry->datac, size);
 		}
-		entry = (TaskMessageEntry*)((DWORD)entry + entry->totalsize_dword0 -4 + 12);
+		entry = entry->nextentry_dword4;
+		i++;
 	}
 }
 
@@ -69,4 +65,15 @@ void TaskMessageFifo::install() {
 	addrCopyFiFo = _ScanPattern("CopyFiFo", "\x53\x8B\x58\x14\x85\xDB\x55\x57\x74\x72\x8D\x9B\x00\x00\x00\x00\x8B\x3B\x8B\x56\x08\x8B\x46\x0C\x8D\x4F\x0B\x83\xE1\xFC\x3B\xD0", "??????xxxxxx????xxxxxxxxxxxxxxxx");
 	addrFifoMakeSpace = _ScanPattern("FifoMakeSpace", "\x53\x56\x8B\x70\x08\x57\x8B\xF9\x8B\x48\x0C\x8D\x57\x0B\x83\xE2\xFC\x3B\xF1\x8D\x1C\x16\x7D\x0A\x3B\xD9\x7C\x17\x5F\x5E\x33\xC0\x5B\xC3", "??????xxxxxxxxxxxxxxxxxxxxxxxxxxxx");
 	addrTaskMessageSend = Hooks::scanPattern("TaskMessageSend", "\x56\x8B\xF1\x83\xC6\x03\x83\xE6\xFC\x8D\x4E\x04\xE8\x00\x00\x00\x00\x85\xC0\x75\x04\x5E\xC2\x08\x00\x85\xF6\x8B\x4C\x24\x08\x89\x08\x74\x12\x8B\x54\x24\x0C\x56", "??????xxxxxxx????xxxxxxxxxxxxxxxxxxxxxxx");
+}
+
+void TaskMessageFifo::clean() {
+	if(this->data_start_dword14) {
+		memset((void*)this->data_start_dword14, 0, this->size_dword8);
+		this->size_dword8 = 0;
+		this->dwordC = 0;
+		this->dword10 = 0;
+		this->data_start_dword14 = 0;
+		this->num_elements_dword18 = 0;
+	}
 }

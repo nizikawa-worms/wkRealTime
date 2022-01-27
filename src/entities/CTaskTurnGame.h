@@ -4,6 +4,7 @@
 
 #include "CTask.h"
 #include "../TaskMessageFifo.h"
+#include "CTaskTeam.h"
 
 class CTaskTurnGame : public CTask {
 public:
@@ -92,7 +93,7 @@ public:
 	int unknown178; // 0x178
 	int unknown17C; // 0x17C
 	int unknown180; // 0x180
-	int unknown184; // 0x184
+	int round_timer_dword184; // 0x184
 	int unknown188; // 0x188
 	int unknown18C; // 0x18C
 	int unknown190; // 0x190
@@ -185,16 +186,19 @@ private:
 	static int __fastcall hookTurnHandleMessage(CTaskTurnGame * This, int EDX, CTask * sender, Constants::TaskMessage mtype, size_t size, void * data);
 	static DWORD __stdcall hookSetActiveWorm();
 	static inline bool flagActivatingTeam = false;
+	static void spoofTeamMessage(CTaskTurnGame *This, const void *data, Constants::TaskMessage mtype);
 public:
 	static void install();
 };
 
 #pragma pack(push, 1)
 struct GameState {
-	DWORD frame;
+//	DWORD frame;
+//	DWORD roundTimer;
 	DWORD wind;
 
-	GameState();
+	GameState() = delete;
+	GameState(CTaskTurnGame * turngame);
 	bool apply(CTaskTurnGame * turngame);
 };
 #pragma pack(pop)

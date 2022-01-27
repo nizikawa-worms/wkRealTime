@@ -1,4 +1,4 @@
-# wkRealTime v.0.0.4d
+# wkRealTime v.0.0.5
 _Experimental Worms Armageddon WormKit module that implements real-time online multiplayer for racing schemes._
 
 ## Installation

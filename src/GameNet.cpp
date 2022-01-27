@@ -23,8 +23,8 @@ void GameNet::hookGameNetUnknown_c(DWORD ddgame) {
 			TaskMessageFifo * networkFifo = *(TaskMessageFifo**)(ddgame + 0x3C);
 			TaskMessageFifo * controlFifo = *(TaskMessageFifo**)(ddgame + 0x50);
 
-			sendWormStates(inputFifo, turngame);
-
+			static unsigned int counter = 0; counter = (counter + 1) % inactiveWormsInterval;
+			sendWormStates(inputFifo, turngame, counter == 0);
 			turngame->vtable8_HandleMessage(turngame, Constants::TaskMessage::TaskMessage_ProcessInput, 1032, &inputFifo);
 			if(inputFifo->num_elements_dword18 > 0) {
 				TaskMessageFifo::callCopyFiFo(inputFifo, networkFifo);
@@ -38,8 +38,8 @@ void GameNet::hookGameNetUnknown_c(DWORD ddgame) {
 }
 
 void __stdcall GameNet::gamenetmain_patch2_c() {
-//	DWORD gamenet = W2App::getAddrWsGameNet();
-//	callSendOutOfOrder(gamenet);
+	DWORD gamenet = W2App::getAddrWsGameNet();
+	callSendOutOfOrder(gamenet);
 }
 
 //sending state from team owning the turn
@@ -47,28 +47,29 @@ void __stdcall GameNet::gamenetmain_patch1_c(DWORD ddgame) {
 	if (RealTime::isActive() && RealTime::isTurn()) {
 		DWORD gamenet = W2App::getAddrWsGameNet();
 		TaskMessageFifo * inputFifo = *(TaskMessageFifo**)(ddgame + 0x40);
-		TaskMessageFifo * chatFifo = *(TaskMessageFifo**)(ddgame + 0x28);
+//		TaskMessageFifo * chatFifo = *(TaskMessageFifo**)(ddgame + 0x28);
 		TaskMessageFifo * networkFifo = *(TaskMessageFifo**)(ddgame + 0x3C);
-		TaskMessageFifo * controlFifo = *(TaskMessageFifo**)(ddgame + 0x50);
-
-//		GameState gamestate;
-//		TaskMessageFifo::callTaskMessageSend(networkFifo, 0, Constants::TaskMessage::TaskMessage_GameState, &gamestate);
+//		TaskMessageFifo * controlFifo = *(TaskMessageFifo**)(ddgame + 0x50);
 		CTaskTurnGame * turngame = *(CTaskTurnGame**)(ddgame + 0x8);
-		sendWormStates(inputFifo, turngame);
+
+		GameState gamestate(turngame);
+		TaskMessageFifo::callTaskMessageSend(inputFifo, sizeof(gamestate), Constants::TaskMessage::TaskMessage_GameState, &gamestate);
+		static unsigned int counter = 0; counter = (counter + 1) % inactiveWormsInterval;
+		sendWormStates(inputFifo, turngame, counter == 0);
 		TaskMessageFifo::callCopyFiFo(inputFifo, networkFifo);
 		(*(void (__thiscall **)(DWORD, TaskMessageFifo *))(*(DWORD*)gamenet + 8))(gamenet, networkFifo); // serialize events to network
-		callSendOutOfOrder(gamenet);
+//		callSendOutOfOrder(gamenet); //sent in gamenetmain_patch2_c
 	}
 }
 
-void GameNet::sendWormStates(TaskMessageFifo *fifo, CTaskTurnGame *turngame) {
+void GameNet::sendWormStates(TaskMessageFifo *fifo, CTaskTurnGame *turngame, bool sendInactiveWorms) {
 	turngame->traverse([&](CTask * obj, const int level) {
 		if(obj->classtype == Constants::ClassType_Task_Team) {
 			CTaskTeam * team = (CTaskTeam*)obj;
 			if(team->isOwnedByMe()) {
 				for(auto child : team->children) {
 					CTaskWorm * worm = (CTaskWorm*)child;
-					if(worm->active_dword104) {
+					if(worm->active_dword104 || sendInactiveWorms) {
 						WormState state(worm);
 						TaskMessageFifo::callTaskMessageSend(fifo, sizeof(WormState), Constants::TaskMessage_WormState, &state);
 					}
@@ -95,7 +96,8 @@ int __stdcall GameNet::hookGameNetUnknown() {
 
 
 void __stdcall GameNet::injectRealtimeFifoEvents() {
-	if(!RealTime::isActive() || !RealTime::isTurn()) return;
+//	if(!RealTime::isActive() || !RealTime::isTurn()) return;
+	if(!RealTime::isActive()) return;
 
 	DWORD ddgame = W2App::getAddrDdGame();
 	DWORD gameglobal = W2App::getAddrGameGlobal();
@@ -113,12 +115,12 @@ void __stdcall GameNet::injectRealtimeFifoEvents() {
 
 		TaskMessageFifo * fifo = *(TaskMessageFifo **)(gamenet+0x24 + 0x68 * i);
 		if(fifo->data_start_dword14) {
-			for(int n=0; n < fifo->num_elements_dword18; n++) {
+			int numElements = fifo->num_elements_dword18;
+			for(int n=0; n < numElements; n++) {
 				size_t msize;
 				int mtype;
 				unsigned char data[2048];
 				callFifoGamenetGetEvent(i, &msize, gamenet, &mtype, (unsigned char*)&data);
-
 				if(mtype == Constants::TaskMessage::TaskMessage_FrameFinish) {
 					break;
 				}
@@ -286,11 +288,6 @@ void GameNet::install() {
 	addrFifoGamenetGetEvent = _ScanPattern("FifoGamenetGetEvent", "\x8B\x4C\x24\x04\x83\x79\x10\x00\x74\x64\x85\xC0\x7C\x60\x3B\x41\x08\x7D\x5B\x6B\xC0\x68\x56\x57\x8B\x7C\x08\x24\x83\x7F\x14\x00\x74\x45\x8B\x47\x14\x8B\x08\x8D\x70\x08\x85\xF6\x89\x0A\x74\x37", "??????xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx");
 	DWORD addrTaskMessageSerializer = _ScanPattern("TaskMessageSerializer", "\x8B\x44\x24\x08\x83\xF8\x74\x53\x8B\x5C\x24\x14\x55\x56\x8B\x74\x24\x10\x57\x8B\x7C\x24\x1C\x88\x01\x0F\x87\x00\x00\x00\x00\x0F\xB6\x80\x00\x00\x00\x00\xFF\x24\x85\x00\x00\x00\x00\x83\xFB\xFF\x0F\x8D\x00\x00\x00\x00\x5F\x5E", "??????xxxxxxxxxxxxxxxxxxxxx????xxx????xxx????xxxxx????xx");
 	DWORD addrTaskMessageDeserializer = _ScanPattern("TaskMessageDeserializer", "\x55\x8B\xEC\x83\xE4\xF8\x8B\x55\x18\x83\xEC\x08\x53\x8B\x5D\x08\x85\xDB\x57\x8B\xF8\x77\x0B\x83\xC8\xFF\x5F\x5B\x8B\xE5\x5D\xC2\x14\x00\x0F\xB6\x01", "??????xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx");
-
-
-//	DWORD addrChatKeyHandling = _ScanPattern("ChatKeyHandling", "\x81\xEC\x00\x00\x00\x00\x53\x55\x8B\xAC\x24\x00\x00\x00\x00\x8B\x85\x00\x00\x00\x00\x8B\x08\x8B\x51\x04\x8B\x02\x8B\x11\x56\x89\x44\x24\x28\x8B\x42\x14\x33\xF6\x57\x89\x74\x24\x14\x89\x4C\x24\x20\xFF\xD0\x8A\xD8", "??????xxxxx????xx????xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx");
-//	DWORD addrHandleRealtimeControlMessages = _ScanPattern("HandleRealtimeControlMessages", "\x81\xEC\x00\x00\x00\x00\x53\x55\x8B\xAC\x24\x00\x00\x00\x00\x8B\x85\x00\x00\x00\x00\x8B\x40\x1C\x89\x44\x24\x10\x8B\x40\x08\x85\xC0\x56\x57\x89\x44\x24\x1C\xC7\x44\x24\x00\x00\x00\x00\x00\x0F\x8E\x00\x00\x00\x00\x8B\x54\x24\x14", "??????xxxxx????xx????xxxxxxxxxxxxxxxxxxxxx?????xx????xxxx");
-
 
 	_HookDefault(WriteStateChecksum);
 	_HookDefault(TaskMessageIgnoredChecksum);
