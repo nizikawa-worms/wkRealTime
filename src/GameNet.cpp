@@ -90,6 +90,7 @@ int __stdcall GameNet::hookGameNetUnknown() {
 
 	hookGameNetUnknown_c(ddgame);
 	injectRealtimeFifoEvents();
+	enqueueDebugFifo();
 
 	return retv;
 }
@@ -121,6 +122,7 @@ void __stdcall GameNet::injectRealtimeFifoEvents() {
 				int mtype;
 				unsigned char data[2048];
 				callFifoGamenetGetEvent(i, &msize, gamenet, &mtype, (unsigned char*)&data);
+
 				if(mtype == Constants::TaskMessage::TaskMessage_FrameFinish) {
 					break;
 				}
@@ -288,6 +290,7 @@ void GameNet::install() {
 	addrFifoGamenetGetEvent = _ScanPattern("FifoGamenetGetEvent", "\x8B\x4C\x24\x04\x83\x79\x10\x00\x74\x64\x85\xC0\x7C\x60\x3B\x41\x08\x7D\x5B\x6B\xC0\x68\x56\x57\x8B\x7C\x08\x24\x83\x7F\x14\x00\x74\x45\x8B\x47\x14\x8B\x08\x8D\x70\x08\x85\xF6\x89\x0A\x74\x37", "??????xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx");
 	DWORD addrTaskMessageSerializer = _ScanPattern("TaskMessageSerializer", "\x8B\x44\x24\x08\x83\xF8\x74\x53\x8B\x5C\x24\x14\x55\x56\x8B\x74\x24\x10\x57\x8B\x7C\x24\x1C\x88\x01\x0F\x87\x00\x00\x00\x00\x0F\xB6\x80\x00\x00\x00\x00\xFF\x24\x85\x00\x00\x00\x00\x83\xFB\xFF\x0F\x8D\x00\x00\x00\x00\x5F\x5E", "??????xxxxxxxxxxxxxxxxxxxxx????xxx????xxx????xxxxx????xx");
 	DWORD addrTaskMessageDeserializer = _ScanPattern("TaskMessageDeserializer", "\x55\x8B\xEC\x83\xE4\xF8\x8B\x55\x18\x83\xEC\x08\x53\x8B\x5D\x08\x85\xDB\x57\x8B\xF8\x77\x0B\x83\xC8\xFF\x5F\x5B\x8B\xE5\x5D\xC2\x14\x00\x0F\xB6\x01", "??????xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx");
+	DWORD addrInitializeFiFoQueues = _ScanPattern("InitializeFiFoQueues", "\x64\xA1\x00\x00\x00\x00\x6A\xFF\x68\x00\x00\x00\x00\x50\x8B\x44\x24\x1C\x64\x89\x25\x00\x00\x00\x00\x53\x55\x8B\x6C\x24\x18\x56\x57\x6A\x3C\x89\x45\x0C\x89\x4D\x14\xC7\x45\x00\x00\x00\x00\x00\xE8\x00\x00\x00\x00\x8B\xF0\x33\xC0", "??????xxx????xxxxxxxx????xxxxxxxxxxxxxxxxxx?????x????xxxx");
 
 	_HookDefault(WriteStateChecksum);
 	_HookDefault(TaskMessageIgnoredChecksum);
@@ -301,4 +304,48 @@ void GameNet::install() {
 
 	gamenetmain_patch2_ret = addrGamenetMain + 0x221; //52DEE1
 	Hooks::hookAsm(addrGamenetMain + 0x16A, (DWORD)&gamenetmain_patch2);  //52DE2C
+
+	int newFifoSize20 = newFifoSize + 0x20;
+	_PatchAsm(addrInitializeFiFoQueues + 0x5F, (unsigned char*)&newFifoSize20, sizeof(newFifoSize20));
+	_PatchAsm(addrInitializeFiFoQueues + 0x66, (unsigned char*)&newFifoSize, sizeof(newFifoSize));
+	_PatchAsm(addrInitializeFiFoQueues + 0x70, (unsigned char*)&newFifoSize, sizeof(newFifoSize));
+	_PatchAsm(addrInitializeFiFoQueues + 0xF5, (unsigned char*)&newFifoSize, sizeof(newFifoSize20));
+	_PatchAsm(addrInitializeFiFoQueues + 0xFC, (unsigned char*)&newFifoSize, sizeof(newFifoSize));
+	_PatchAsm(addrInitializeFiFoQueues + 0x106, (unsigned char*)&newFifoSize, sizeof(newFifoSize));
+}
+
+void GameNet::enqueueDebugFifo() {
+	if(RealTime::isDebugFifo()) {
+		int x = 0;
+		int y = 0;
+		std::pair<int, int> dimensions;
+		int space = 0;
+		DWORD ddgame = W2App::getAddrDdGame();
+		TaskMessageFifo * inputFifo = *(TaskMessageFifo**)(ddgame + 0x40);
+		dimensions = inputFifo->enqueueDebugDisplay("Input", x, y); y+= dimensions.second + space;
+		TaskMessageFifo * chatFifo = *(TaskMessageFifo**)(ddgame + 0x28);
+		dimensions = chatFifo->enqueueDebugDisplay("Chat", x, y); y+= dimensions.second + space;
+		TaskMessageFifo * networkFifo = *(TaskMessageFifo**)(ddgame + 0x3C);
+		dimensions = networkFifo->enqueueDebugDisplay("Network", x, y); y+= dimensions.second + space;
+		TaskMessageFifo * replayFifo = *(TaskMessageFifo**)(ddgame + 0x50);
+		dimensions = replayFifo->enqueueDebugDisplay("Replay", x, y); y+= dimensions.second + space;
+
+		DWORD gamenet = W2App::getAddrWsGameNet();
+		if(gamenet) {
+			DWORD gameglobal = W2App::getAddrGameGlobal();
+			DWORD ddmain = W2App::getAddrDdMain();
+
+			TaskMessageFifo *fifo0x20 = *(TaskMessageFifo **) (gamenet + 0x20);
+			dimensions = fifo0x20->enqueueDebugDisplay("GameNet0x20", x, y); y+= dimensions.second + space;
+
+			DWORD numMachines = *(DWORD*)(gamenet + 0x8);
+			DWORD currentMachine = *(DWORD*)(gameglobal + 0x726C);
+			char myMachine = *(char *) (ddmain + 0xD9DC + 0x40);
+			for(int i=0; i < numMachines; i++) {
+				TaskMessageFifo *fifo = *(TaskMessageFifo **) (gamenet + 0x24 + 0x68 * i);
+				dimensions = fifo->enqueueDebugDisplay(std::format("GameNet{}{}{}", i, (i == myMachine ? " (MY)" : ""), (i == currentMachine ? " (Current)" : "")), x, y);
+				y+= dimensions.second + space;
+			}
+		}
+	}
 }

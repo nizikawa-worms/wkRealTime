@@ -5,9 +5,14 @@
 #include "Debugf.h"
 #include "Hooks.h"
 #include "Constants.h"
+#include "Drawing.h"
+#include "W2App.h"
+#include "RealTime.h"
+
+std::map<TaskMessageFifo*, std::unique_ptr<FifoDebugDisplay>> TaskMessageFifo::debugFifoTextboxes;
 
 void TaskMessageFifo::printInfo() {
-	debugf("TaskMessageFifo: this: 0x%X dword0: 0x%X dword4: 0x%X dword8: 0x%X dwordC: 0x%X dword10: 0x%X dword14: 0x%X dword18: 0x%X\n", (DWORD)this, this->dword0, this->dword4, this->size_dword8, this->dwordC, this->dword10, this->data_start_dword14, this->num_elements_dword18);
+	debugf("TaskMessageFifo: this: 0x%X dword0: 0x%X capacity_dword4: 0x%X dword8: 0x%X dwordC: 0x%X dword10: 0x%X dword14: 0x%X dword18: 0x%X\n", (DWORD)this, this->dword0, this->capacity_dword4, this->end_dword8, this->start_dwordC, this->dword10, this->data_start_dword14, this->num_elements_dword18);
 }
 
 void TaskMessageFifo::printContents() {
@@ -15,7 +20,7 @@ void TaskMessageFifo::printContents() {
 	int i = 0;
 	while(entry) {
 		DWORD size = entry->totalsize_dword0 - 4;
-		printf("\t%d: entry: 0x%08X tsize: %d size: %d, dword4: 0x%08X type: %d\n", i, (DWORD)entry, entry->totalsize_dword0, size, entry->nextentry_dword4, entry->type_dword8);
+		printf("\t%d: entry: 0x%08X tsize: %d size: %d, capacity_dword4: 0x%08X type: %d\n", i, (DWORD)entry, entry->totalsize_dword0, size, entry->nextentry_dword4, entry->type_dword8);
 		if(size) {
 			Utils::hexDump("Payload", entry->datac, size);
 		}
@@ -67,13 +72,52 @@ void TaskMessageFifo::install() {
 	addrTaskMessageSend = Hooks::scanPattern("TaskMessageSend", "\x56\x8B\xF1\x83\xC6\x03\x83\xE6\xFC\x8D\x4E\x04\xE8\x00\x00\x00\x00\x85\xC0\x75\x04\x5E\xC2\x08\x00\x85\xF6\x8B\x4C\x24\x08\x89\x08\x74\x12\x8B\x54\x24\x0C\x56", "??????xxxxxxx????xxxxxxxxxxxxxxxxxxxxxxx");
 }
 
-void TaskMessageFifo::clean() {
-	if(this->data_start_dword14) {
-		memset((void*)this->data_start_dword14, 0, this->size_dword8);
-		this->size_dword8 = 0;
-		this->dwordC = 0;
-		this->dword10 = 0;
-		this->data_start_dword14 = 0;
-		this->num_elements_dword18 = 0;
+std::pair<int, int> TaskMessageFifo::enqueueDebugDisplay(std::string name, int x, int y) {
+	if(debugFifoTextboxes.find(this) == debugFifoTextboxes.end()) {
+		debugFifoTextboxes[this] = std::make_unique<FifoDebugDisplay>(FifoDebugDisplay{BitmapTextbox(), 0, 0, 0, 0, false});
 	}
+
+	auto & entry = debugFifoTextboxes[this];
+	int width, height;
+
+	std::string contents;
+	if(this->data_start_dword14) {
+		TaskMessageEntry *fifoentry = (TaskMessageEntry *) this->data_start_dword14;
+		int i = 0;
+		while (fifoentry) {
+//			DWORD size = fifoentry->totalsize_dword0 - 4;
+//			contents += std::format("{}({}) ", fifoentry->type_dword8, size);
+			contents += std::format("{} ", fifoentry->type_dword8);
+			fifoentry = fifoentry->nextentry_dword4;
+			i++;
+		}
+	}
+
+	entry->bmp = entry->textbox.setText((char*)std::format("{} num: {} size: {}, {}", name, this->num_elements_dword18, (int)(this->end_dword8 - this->start_dwordC), contents).c_str(), &width, &height);
+	entry->x = x;
+	entry->y = y;
+	entry->width = width;
+	entry->height = height;
+	entry->visible = true;
+
+	return {width, height};
+}
+
+void TaskMessageFifo::onTurnGameRenderScene() {
+	if(!RealTime::isDebugFifo()) return;
+	DWORD gameglobal = W2App::getAddrGameGlobal();
+	DWORD screenw = *(DWORD *) (gameglobal + 0x77ac);
+	DWORD screenh = *(DWORD *) (gameglobal + 0x77b4);
+
+	for(auto & it : debugFifoTextboxes) {
+		auto & entry = it.second;
+//		if(entry->visible) {
+			entry->bmp->drawScreen((-screenh / 2 + 20 + entry->y) << 16, 10, (-screenw / 2 + entry->width/2 + entry->x) << 16, 0x0, entry->width, entry->height, 0x0);
+//			entry->visible = false;
+//		}
+	}
+}
+
+void TaskMessageFifo::onDestructGameGlobal() {
+	debugFifoTextboxes.clear();
 }

@@ -4,6 +4,7 @@
 #include "Utils.h"
 #include "WaLibc.h"
 #include "Debugf.h"
+#include "RealTime.h"
 #include <filesystem>
 
 namespace fs = std::filesystem;
@@ -21,6 +22,7 @@ void Config::readConfig() {
 
 	devConsoleEnabled = GetPrivateProfileIntA("debug", "EnableDevConsole", 0, inipath.c_str());
 	hexDumpPackets = GetPrivateProfileIntA("debug", "HexDumpPackets", 0, inipath.c_str());
+	RealTime::setDebugFifo(GetPrivateProfileIntA("debug", "ShowFifo", 0, inipath.c_str()));
 
 	logToFile = GetPrivateProfileIntA("debug", "LogToFile", 0, inipath.c_str());
 	if(logToFile) {
@@ -98,11 +100,11 @@ std::string Config::getModuleStr() {
 }
 
 std::string Config::getVersionStr() {
-	return "v0.0.5a";
+	return "v0.0.5b";
 }
 
 int Config::getVersionInt() {
-	return 501;
+	return 502;
 }
 
 std::string Config::getBuildStr() {

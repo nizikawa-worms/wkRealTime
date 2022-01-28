@@ -39,8 +39,10 @@ add_library(wkRealTime SHARED
         src/Chat.cpp src/Chat.h
         src/entities/CTaskWorm.cpp src/entities/CTaskWorm.h
         src/GameNet.cpp src/GameNet.h
+        src/Camera.cpp src/Camera.h
+        src/Drawing.cpp src/Drawing.h
         ${CMAKE_CURRENT_BINARY_DIR}/resource.rc
-        src/Camera.cpp src/Camera.h)
+)
 
 set_property(TARGET wkRealTime hacklib PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
 

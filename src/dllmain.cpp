@@ -23,11 +23,11 @@
 #include "entities/CTaskWorm.h"
 #include "GameNet.h"
 #include "Camera.h"
+#include "Drawing.h"
 
 void install() {
-	auto start_hooks = std::chrono::high_resolution_clock::now();
 	srand(time(0) * GetCurrentProcessId());
-	debugf("Detected WA installation directory: %s\n", Config::getWaDir().string().c_str());
+
 	WaLibc::install();
 	LobbyPackets::install();
 	LobbyChat::install();
@@ -43,6 +43,7 @@ void install() {
 	RealTime::install();
 	Chat::install();
 	Camera::install();
+	Drawing::install();
 }
 
 // Thanks StepS

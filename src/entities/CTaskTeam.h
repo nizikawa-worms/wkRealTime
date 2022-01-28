@@ -1,6 +1,6 @@
 
-#ifndef WKWORMORDER_CTASKTEAM_H
-#define WKWORMORDER_CTASKTEAM_H
+#ifndef WKREALTIME_CTASKTEAM_H
+#define WKREALTIME_CTASKTEAM_H
 
 
 #include "CTask.h"
@@ -285,4 +285,4 @@ public:
 	bool isOwnedByMe();
 };
 
-#endif //WKWORMORDER_CTASKTEAM_H
+#endif //WKREALTIME_CTASKTEAM_H

@@ -1,5 +1,5 @@
-#ifndef WKWORMORDER_CGAMETASK_H
-#define WKWORMORDER_CGAMETASK_H
+#ifndef WKREALTIME_CGAMETASK_H
+#define WKREALTIME_CGAMETASK_H
 
 
 #include "CTask.h"
@@ -72,4 +72,4 @@ public:
 };
 
 
-#endif //WKWORMORDER_CGAMETASK_H
+#endif //WKREALTIME_CGAMETASK_H

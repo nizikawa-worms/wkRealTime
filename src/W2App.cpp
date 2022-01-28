@@ -3,6 +3,8 @@
 #include "Config.h"
 #include "LobbyChat.h"
 #include "RealTime.h"
+#include "Drawing.h"
+#include "TaskMessageFifo.h"
 
 DWORD origInitializeW2App;
 DWORD __stdcall W2App::hookInitializeW2App(DWORD DD_Game_a2, DWORD DD_Display_a3, DWORD DS_Sound_a4, DWORD DD_Keyboard_a5, DWORD DD_Mouse_a6, DWORD WAV_CDrom_a7, DWORD WS_GameNet_a8) {
@@ -39,6 +41,7 @@ DWORD __stdcall W2App::hookConstructGameGlobal(DWORD ddgame) {
 	auto ret = origConstructGameGlobal(ddgame);
 	addrGameGlobal = *(DWORD*)(ddgame + 0x488);
 
+	Drawing::onConstructGameGlobal();
 
 	return ret;
 }
@@ -46,10 +49,12 @@ DWORD __stdcall W2App::hookConstructGameGlobal(DWORD ddgame) {
 DWORD (__fastcall *origDestroyGameGlobal)(int This, int EDX);
 DWORD __fastcall W2App::hookDestroyGameGlobal(int This, int EDX) {
 	addrGameGlobal = 0;
+	Drawing::onDestructGameGlobal();
+	TaskMessageFifo::onDestructGameGlobal();
+	RealTime::onDestructGameGlobal();
+
 	auto ret = origDestroyGameGlobal(This, EDX);
 	addrDDDisplay = addrDSSound = addrDDKeyboard = addrDDMouse = addrWavCDRom = addrWSGameNet = addrDDGame = 0;
-
-	RealTime::onDestructGameGlobal();
 
 	return ret;
 }

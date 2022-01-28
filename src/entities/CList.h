@@ -1,7 +1,7 @@
 
 
-#ifndef WKWORMORDER_CLIST_H
-#define WKWORMORDER_CLIST_H
+#ifndef WKREALTIME_CLIST_H
+#define WKREALTIME_CLIST_H
 
 #include <iostream>
 #include <vector>
@@ -122,4 +122,4 @@ private:
 };
 
 
-#endif //WKWORMORDER_CLIST_H
+#endif //WKREALTIME_CLIST_H

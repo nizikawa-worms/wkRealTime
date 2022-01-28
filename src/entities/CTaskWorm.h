@@ -1,5 +1,5 @@
-#ifndef WKWORMORDER_CTASKWORM_H
-#define WKWORMORDER_CTASKWORM_H
+#ifndef WKREALTIME_CTASKWORM_H
+#define WKREALTIME_CTASKWORM_H
 
 
 #include "CGameTask.h"
@@ -239,4 +239,4 @@ struct WormState {
 };
 #pragma pack(pop)
 
-#endif //WKWORMORDER_CTASKWORM_H
+#endif //WKREALTIME_CTASKWORM_H

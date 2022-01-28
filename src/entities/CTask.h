@@ -1,5 +1,5 @@
-#ifndef WKWORMORDER_CTASK_H
-#define WKWORMORDER_CTASK_H
+#ifndef WKREALTIME_CTASK_H
+#define WKREALTIME_CTASK_H
 
 
 
@@ -48,4 +48,4 @@ public:
 };
 
 
-#endif //WKWORMORDER_CTASK_H
+#endif //WKREALTIME_CTASK_H

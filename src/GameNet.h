@@ -16,6 +16,7 @@ struct ChatMessage {
 class GameNet {
 private:
 	static const int inactiveWormsInterval = 25;
+	static const int newFifoSize = 0xA00000;
 
 	static int callSendOutOfOrder(DWORD gamenet);
 	static int __stdcall hookGameNetUnknown();
@@ -28,6 +29,7 @@ private:
 	static void __stdcall gamenetmain_patch2_c();
 public:
 	static void install();
+	static void enqueueDebugFifo();
 };
 
 
