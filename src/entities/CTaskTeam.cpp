@@ -58,8 +58,10 @@ bool CTaskTeam::isOwnedByMe() {
 }
 
 bool CTaskTeam::fixCurrentWorm() {
+	if(this == nullptr) return false;
 	int first_worm_number = 0;
 	for (auto child : this->children) {
+		if(child == nullptr) continue;
 		CTaskWorm *worm = (CTaskWorm *) child;
 		if (!first_worm_number) first_worm_number = worm->wormnumber_dword100;
 		if (this->current_worm_number_dword48 == worm->wormnumber_dword100) {
