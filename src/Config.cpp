@@ -17,8 +17,9 @@ void Config::readConfig() {
 	moduleEnabled = GetPrivateProfileIntA("general", "EnableModule", 1, inipath.c_str());
 	useOffsetCache = GetPrivateProfileIntA("general", "UseOffsetCache", 1, inipath.c_str());
 	useMutex = GetPrivateProfileIntA("general", "UseMutex", 0, inipath.c_str());
-
 	ignoreVersionCheck = GetPrivateProfileIntA("general", "IgnoreVersionCheck", 0, inipath.c_str());
+
+	colorMod = GetPrivateProfileIntA("general", "ColorMod", 1, inipath.c_str());
 
 	devConsoleEnabled = GetPrivateProfileIntA("debug", "EnableDevConsole", 0, inipath.c_str());
 	hexDumpPackets = GetPrivateProfileIntA("debug", "HexDumpPackets", 0, inipath.c_str());
@@ -100,11 +101,11 @@ std::string Config::getModuleStr() {
 }
 
 std::string Config::getVersionStr() {
-	return "v0.0.5b";
+	return "v0.0.6";
 }
 
 int Config::getVersionInt() {
-	return 502;
+	return 600;
 }
 
 std::string Config::getBuildStr() {
@@ -146,5 +147,9 @@ bool Config::isLogToFile() {
 
 bool Config::isMutexEnabled() {
 	return useMutex;
+}
+
+int Config::getColorMod() {
+	return colorMod;
 }
 

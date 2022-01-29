@@ -44,6 +44,7 @@ public:
 
 	void printInfo();
 	void printContents();
+	DWORD getSize();
 
 	std::pair<int, int> enqueueDebugDisplay(std::string name, int x, int y);
 	static void onTurnGameRenderScene();

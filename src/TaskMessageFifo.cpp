@@ -90,10 +90,14 @@ std::pair<int, int> TaskMessageFifo::enqueueDebugDisplay(std::string name, int x
 			contents += std::format("{} ", fifoentry->type_dword8);
 			fifoentry = fifoentry->nextentry_dword4;
 			i++;
+			if(i > 20) {
+				contents += "...";
+				break;
+			}
 		}
 	}
 
-	entry->bmp = entry->textbox.setText((char*)std::format("{} num: {} size: {}, {}", name, this->num_elements_dword18, (int)(this->end_dword8 - this->start_dwordC), contents).c_str(), &width, &height);
+	entry->bmp = entry->textbox.setText((char*)std::format("{} num: {} size: {}, {}", name, this->num_elements_dword18, getSize(), contents).c_str(), &width, &height);
 	entry->x = x;
 	entry->y = y;
 	entry->width = width;
@@ -120,4 +124,11 @@ void TaskMessageFifo::onTurnGameRenderScene() {
 
 void TaskMessageFifo::onDestructGameGlobal() {
 	debugFifoTextboxes.clear();
+}
+
+DWORD TaskMessageFifo::getSize() {
+	if(end_dword8 < start_dwordC)
+		return end_dword8 + capacity_dword4 - start_dwordC;
+	else
+		return end_dword8 - start_dwordC;
 }

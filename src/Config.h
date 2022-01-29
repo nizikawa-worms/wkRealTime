@@ -23,6 +23,7 @@ private:
 	static inline std::filesystem::path waDir;
 
 	static inline bool logToFile = false;
+	static inline int colorMod = 0;
 public:
 
 	static void readConfig();
@@ -48,6 +49,8 @@ public:
 	static inline FILE * logfile;
 
 	static std::string getWaVersionAsString();
+
+	static int getColorMod();
 };
 
 

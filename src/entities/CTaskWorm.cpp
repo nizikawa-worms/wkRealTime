@@ -5,6 +5,7 @@
 #include "CTaskTurnGame.h"
 #include "CTaskTeam.h"
 #include "../W2App.h"
+#include "../RealTime.h"
 
 int (__fastcall *origWormHandleMessage)(CTaskWorm * This, int EDX, CTask * sender, Constants::TaskMessage mtype, size_t size, void * data);
 int __fastcall CTaskWorm::hookWormHandleMessage(CTaskWorm * This, int EDX, CTask * sender, Constants::TaskMessage mtype, size_t size, void * data) {
@@ -17,7 +18,7 @@ int __fastcall CTaskWorm::hookWormHandleMessage(CTaskWorm * This, int EDX, CTask
 			}
 			break;
 		case Constants::TaskMessage_RenderScene:
-			{
+			if(Config::getColorMod() == 2 || (Config::getColorMod() == 1 && RealTime::isActive())){
 				// This enables ColorMod (originally from RubberWorm)
 				DWORD gameglobal = W2App::getAddrGameGlobal();
 				DWORD *colors = (DWORD*)(gameglobal + 0x72D8 + 0x30); // 0x7248 in 3.7.2
