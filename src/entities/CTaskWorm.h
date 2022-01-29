@@ -14,8 +14,8 @@ public:
 	int teamnumber_dwordFC; // 0xFC
 	int wormnumber_dword100; // 0x100
 	int active_dword104; // 0x104
-	int unknown108; // 0x108
-	int unknown10C; // 0x10C
+	int suspended_dword108; // 0x108
+	int color_dword10C; // 0x10C
 	int unknown110; // 0x110
 	int unknown114; // 0x114
 	int unknown118; // 0x118

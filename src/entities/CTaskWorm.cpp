@@ -16,6 +16,18 @@ int __fastcall CTaskWorm::hookWormHandleMessage(CTaskWorm * This, int EDX, CTask
 				This->selected_weapon_entry_ptr36C = weaponTable + 464 * This->selected_weapon_unknown170;
 			}
 			break;
+		case Constants::TaskMessage_RenderScene:
+			{
+				// This enables ColorMod (originally from RubberWorm)
+				DWORD gameglobal = W2App::getAddrGameGlobal();
+				DWORD *colors = (DWORD*)(gameglobal + 0x72D8 + 0x30); // 0x7248 in 3.7.2
+				DWORD oldColor = colors[7];
+				colors[7] = colors[This->color_dword10C + 1];
+				int retVal = origWormHandleMessage(This, EDX, sender, mtype, size, data);
+				colors[7] = oldColor;
+				return retVal;
+			}
+			break;
 		case Constants::TaskMessage_WormState: {
 			WormState *state = (WormState *) data;
 			state->apply(This);
