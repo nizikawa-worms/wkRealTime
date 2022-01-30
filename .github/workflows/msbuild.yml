@@ -11,30 +11,77 @@ jobs:
     runs-on: windows-latest
 
     steps:
-    - uses: actions/checkout@v2
+      - uses: actions/checkout@v2
 
-    - name: Add MSBuild to PATH
-      uses: microsoft/setup-msbuild@v1.0.2
-      
-    - name: Configure CMake
-      run: cmake -B ${{github.workspace}}/build -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}} -A Win32
-      
-    - name: Build
-      run: cmake --build ${{github.workspace}}/build --config ${{env.BUILD_TYPE}}
+      - name: Add MSBuild to PATH
+        uses: microsoft/setup-msbuild@v1.0.2
 
-    - name: Move to bundle
-      run: mv build/${{env.BUILD_TYPE}}/wkRealTime.dll bundle/wkZRealTime.dll
+      - name: Configure CMake
+        run: cmake -B ${{github.workspace}}/build -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}} -A Win32
 
-    - name: Upload Release Artifact
-      uses: actions/upload-artifact@v2
-      with:
-        name: wkRealTime release bundle
-        path: bundle/*
-        retention-days: 90
+      - name: Build
+        run: cmake --build ${{github.workspace}}/build --config ${{env.BUILD_TYPE}}
 
-    - name: Upload .PDB Artifact
-      uses: actions/upload-artifact@v2
-      with:
-        name: PDB
-        path: build/${{env.BUILD_TYPE}}/wkRealTime.pdb
-        retention-days: 90
+      - name: Move wkRealTime.dll to bundle
+        run: mv build/${{env.BUILD_TYPE}}/wkRealTime.dll bundle/wkZRealTime.dll
+
+      - name: Upload wkRealTime-release Artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: wkRealTime-release
+          path: bundle/*
+          retention-days: 10
+
+      - name: Upload wkRealTime-pdb Artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: wkRealTime-pdb
+          path: build/${{env.BUILD_TYPE}}/wkRealTime.pdb
+          retention-days: 10
+
+  publish:
+    needs: build
+    runs-on: ubuntu-latest
+    if: startsWith(github.event.ref, 'refs/tags/v')
+    steps:
+      - name: Download all workflow run artifacts
+        uses: actions/download-artifact@v2
+
+      - name: zip wkRealTime-release.zip
+        run: 7z a wkRealTime-release.zip ./wkRealTime-release/*
+
+      - name: zip wkRealTime-pdb.zip
+        run: 7z a wkRealTime-pdb.zip ./wkRealTime-pdb/*
+
+      - name: Create Release
+        id: create_release
+        uses: actions/create-release@latest
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ github.ref }}
+          release_name: ${{ github.ref }}
+          draft: false
+          prerelease: false
+
+      - name: Upload wkRealTime-release.zip to Release
+        id: upload-release-asset
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./wkRealTime-release.zip
+          asset_name: wkRealTime-release.zip
+          asset_content_type: application/zip
+
+      - name: Upload wkRealTime-pdb.zip to Release
+        id: upload-pdb-asset
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./wkRealTime-pdb.zip
+          asset_name: wkRealTime-pdb.zip
+          asset_content_type: application/zip
