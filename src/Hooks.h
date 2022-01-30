@@ -7,6 +7,7 @@
 #include <vector>
 #include <polyhook2/Detour/x86Detour.hpp>
 #include <polyhook2/PE/IatHook.hpp>
+#include "version.h"
 
 #ifndef __CALLPOSITION__
 #define STRINGIZE_DETAIL(x) #x
@@ -22,7 +23,7 @@ private:
 		~PatchInfo() {PatchMemData((PVOID)addr, original.size(), (PVOID)original.data(), original.size());}
 	};
 
-	static inline const std::string cacheFile = "wkRealTime.cache";
+	static inline const std::string cacheFile = PROJECT_NAME ".cache";
 	static inline std::map<std::string, DWORD> hookNameToAddr;
 	static inline std::map<DWORD, std::string> hookAddrToName;
 

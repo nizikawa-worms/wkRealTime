@@ -5,11 +5,12 @@
 #include <json.hpp>
 #include <set>
 #include <filesystem>
+#include "version.h"
 
 class Config {
 public:
-	static inline const std::string iniFile = "wkRealTime.ini";
-	static inline const std::string moduleName = "wkRealTime";
+	static inline const std::string iniFile = PROJECT_NAME ".ini";
+	static inline const std::string moduleName = PROJECT_NAME;
 
 private:
 	static inline bool moduleEnabled = true;

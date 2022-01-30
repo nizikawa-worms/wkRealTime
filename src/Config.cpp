@@ -27,7 +27,7 @@ void Config::readConfig() {
 
 	logToFile = GetPrivateProfileIntA("debug", "LogToFile", 0, inipath.c_str());
 	if(logToFile) {
-		logfile = fopen("wkRealTime.log", "w");
+		logfile = fopen(PROJECT_NAME ".log", "w");
 	}
 
 }
@@ -84,7 +84,7 @@ int Config::waVersionCheck() {
 		return 1;
 	}
 
-	_snprintf_s(buff, _TRUNCATE, "wkRealTime is not designed to work with your WA version and may malfunction.\n\nTo disable this warning set IgnoreVersionCheck=1 in wkRealTime.ini file.\n\n%s", versionstr);
+	_snprintf_s(buff, _TRUNCATE, PROJECT_NAME " is not designed to work with your WA version and may malfunction.\n\nTo disable this warning set IgnoreVersionCheck=1 in {} file.\n\n%s", versionstr, iniFile.c_str());
 	return MessageBoxA(0, buff, tversion.c_str(), MB_OKCANCEL | MB_ICONWARNING) == IDOK;
 }
 
@@ -97,15 +97,15 @@ void Config::addVersionInfoToJson(nlohmann::json & json) {
 }
 
 std::string Config::getModuleStr() {
-	return "wkRealTime";
+	return PROJECT_NAME;
 }
 
 std::string Config::getVersionStr() {
-	return "v0.0.6";
+	return std::format("v{}.{}.{}.{}", PROJECT_VERSION_MAJOR, PROJECT_VERSION_MINOR, PROJECT_VERSION_PATCH, PROJECT_VERSION_TWEAK);
 }
 
 int Config::getVersionInt() {
-	return 600;
+	return 1000000 * PROJECT_VERSION_MAJOR + 10000 * PROJECT_VERSION_MINOR + 100 * PROJECT_VERSION_PATCH + PROJECT_VERSION_TWEAK;
 }
 
 std::string Config::getBuildStr() {

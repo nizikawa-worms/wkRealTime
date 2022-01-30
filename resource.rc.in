@@ -1,28 +1,28 @@
 
 1 VERSIONINFO
-FILEVERSION 0,0,6,0
-PRODUCTVERSION 0,0,6,0
+FILEVERSION @PROJECT_VERSION_MAJOR@,@PROJECT_VERSION_MINOR@,@PROJECT_VERSION_PATCH@,@PROJECT_VERSION_TWEAK@
+PRODUCTVERSION @PROJECT_VERSION_MAJOR@,@PROJECT_VERSION_MINOR@,@PROJECT_VERSION_PATCH@,@PROJECT_VERSION_TWEAK@
 FILEOS 0x4
 FILETYPE 0x1
 {
 BLOCK "StringFileInfo"
 {
-	BLOCK "040904b0"
-	{
-		VALUE "Comments", ""
-		VALUE "CompanyName", "Nizikawa"
-		VALUE "FileDescription", "Real time network multiplayer"
-		VALUE "FileVersion", "0.0.6,0"
-		VALUE "InternalName", "wkRealTime v0.0.6"
-		VALUE "LegalCopyright", "Nizikawa"
-		VALUE "OriginalFilename", "wkRealTime.dll"
-		VALUE "ProductName", "wkRealTime v0.0.6"
-		VALUE "ProductVersion", "0.0.6.0"
-	}
+    BLOCK "040904b0"
+    {
+        VALUE "Comments", ""
+        VALUE "CompanyName", "nizikawa"
+        VALUE "FileDescription", "@PROJECT_DESCRIPTION@"
+        VALUE "FileVersion", "@PROJECT_VERSION@"
+        VALUE "InternalName", "@PROJECT_NAME@ v@PROJECT_VERSION_MAJOR@.@PROJECT_VERSION_MINOR@.@PROJECT_VERSION_PATCH@.@PROJECT_VERSION_TWEAK@"
+        VALUE "LegalCopyright", "nizikawa"
+        VALUE "OriginalFilename", "@OUTPUT_NAME_RELEASE@.dll"
+        VALUE "ProductName", "@PROJECT_NAME@ v@PROJECT_VERSION_MAJOR@.@PROJECT_VERSION_MINOR@.@PROJECT_VERSION_PATCH@.@PROJECT_VERSION_TWEAK@"
+        VALUE "ProductVersion", "@PROJECT_VERSION@"
+    }
 }
 
 BLOCK "VarFileInfo"
 {
-	VALUE "Translation", 0x0409 0x04B0  
+    VALUE "Translation", 0x0409 0x04B0
 }
 }

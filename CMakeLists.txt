@@ -1,5 +1,8 @@
 cmake_minimum_required(VERSION 3.17)
-project(wkRealTime)
+project(wkRealTime
+        VERSION "0.0.6.1"
+        DESCRIPTION "Real-time network multiplayer for racing schemes"
+        )
 
 set(CMAKE_CXX_STANDARD 23)
 
@@ -14,8 +17,8 @@ configure_file(
         resource.rc.in
         resource.rc
 )
+configure_file(cmake/version.h.in ${CMAKE_CURRENT_BINARY_DIR}/gen/version.h)
 add_definitions(-DLIBRARY_EXPORTS)
-
 add_library(wkRealTime SHARED
         src/dllmain.cpp
         src/Config.cpp src/Config.h
@@ -44,6 +47,7 @@ add_library(wkRealTime SHARED
         ${CMAKE_CURRENT_BINARY_DIR}/resource.rc
 )
 
+target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_CURRENT_BINARY_DIR}/gen)
 set_property(TARGET wkRealTime hacklib PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
 
 target_link_libraries(wkRealTime hacklib capstone Polyhook_2 version libz-static)
