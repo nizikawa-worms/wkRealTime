@@ -1,0 +1,40 @@
+name: MSBuild
+
+on: [push]
+
+env:
+  SOLUTION_FILE_PATH: .
+  BUILD_TYPE: RelWithDebInfo
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Add MSBuild to PATH
+      uses: microsoft/setup-msbuild@v1.0.2
+      
+    - name: Configure CMake
+      run: cmake -B ${{github.workspace}}/build -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}} -A Win32
+      
+    - name: Build
+      run: cmake --build ${{github.workspace}}/build --config ${{env.BUILD_TYPE}}
+
+    - name: Move to bundle
+      run: mv build/${{env.BUILD_TYPE}}/wkRealTime.dll bundle/wkZRealTime.dll
+
+    - name: Upload Release Artifact
+      uses: actions/upload-artifact@v2
+      with:
+        name: wkRealTime release bundle
+        path: bundle/*
+        retention-days: 90
+
+    - name: Upload .PDB Artifact
+      uses: actions/upload-artifact@v2
+      with:
+        name: PDB
+        path: build/${{env.BUILD_TYPE}}/wkRealTime.pdb
+        retention-days: 90
