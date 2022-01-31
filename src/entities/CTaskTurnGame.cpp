@@ -12,6 +12,15 @@
 
 int (__fastcall *origTurnHandleMessage)(CTaskTurnGame * This, int EDX, CTask * sender, Constants::TaskMessage mtype, size_t size, void * data);
 int __fastcall CTaskTurnGame::hookTurnHandleMessage(CTaskTurnGame * This, int EDX, CTask * sender, Constants::TaskMessage mtype, size_t size, void * data) {
+	if(RealTime::isActive() && mtype == Constants::TaskMessage::TaskMessage_WeaponFinished) {
+		// prevent other worms from ending turn in manual placement mode
+		auto wfdata = (struct WeaponFinishedData *) data;
+		if (This->its_before_round_start_dword140 && wfdata->team != This->current_team_1_unknown12C) {
+			debugf("Ignoring WeaponFinished caused by team %ud - current team: %d\n", wfdata->team, This->current_team_1_unknown12C);
+			return 0;
+		}
+	}
+
 	auto ret = origTurnHandleMessage(This, 0, sender, mtype, size, data);
 
 	switch(mtype) {

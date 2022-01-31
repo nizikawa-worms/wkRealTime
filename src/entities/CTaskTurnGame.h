@@ -71,12 +71,12 @@ public:
 	int unknown120; // 0x120
 	int unknown124; // 0x124
 	int unknown128; // 0x128
-	int unknown12C; // 0x12C
+	int current_team_1_unknown12C; // 0x12C
 	int unknown130; // 0x130
-	int unknown134; // 0x134
+	int current_team_2_unknown134; // 0x134
 	int unknown138; // 0x138
 	int unknown13C; // 0x13C
-	int unknown140; // 0x140
+	int its_before_round_start_dword140; // 0x140
 	int unknown144; // 0x144
 	int unknown148; // 0x148
 	int unknown14C; // 0x14C
@@ -201,6 +201,13 @@ struct GameState {
 	GameState(CTaskTurnGame * turngame);
 	bool apply(CTaskTurnGame * turngame);
 };
+
+struct WeaponFinishedData {
+	DWORD team;
+	DWORD worm;
+	Constants::Weapon weapon;
+};
+
 #pragma pack(pop)
 
 #endif //WKJELLYWORM_CTASKTURNGAME_H
