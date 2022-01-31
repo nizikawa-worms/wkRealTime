@@ -13,10 +13,17 @@ add_library(hacklib STATIC
 link_directories(lib)
 include_directories(include lib/hacklib)
 
-configure_file(
-        resource.rc.in
-        resource.rc
-)
+set(PRE_CONFIGURE_FILE "cmake/git.cc.in")
+set(POST_CONFIGURE_FILE "${CMAKE_CURRENT_BINARY_DIR}/gen/git.cc")
+include(cmake/git_watcher.cmake)
+
+add_library(git STATIC ${POST_CONFIGURE_FILE})
+target_include_directories(git PUBLIC ${CMAKE_CURRENT_SOURCE_DIR} cmake)
+add_dependencies(git check_git)
+configure_file(cmake/git.h ${CMAKE_CURRENT_BINARY_DIR}/gen/git.h)
+
+configure_file(resource.rc.in resource.rc)
+
 configure_file(cmake/version.h.in ${CMAKE_CURRENT_BINARY_DIR}/gen/version.h)
 add_definitions(-DLIBRARY_EXPORTS)
 add_library(wkRealTime SHARED
@@ -48,6 +55,5 @@ add_library(wkRealTime SHARED
 )
 
 target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_CURRENT_BINARY_DIR}/gen)
-set_property(TARGET wkRealTime hacklib PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
-
-target_link_libraries(wkRealTime hacklib capstone Polyhook_2 version libz-static)
+set_property(TARGET wkRealTime hacklib git PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
+target_link_libraries(wkRealTime hacklib capstone Polyhook_2 version libz-static git)

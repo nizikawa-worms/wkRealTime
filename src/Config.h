@@ -37,6 +37,7 @@ public:
 	static std::string getBuildStr();
 	static std::string getModuleStr();
 	static std::string getFullStr();
+	static std::string getGitStr();
 	static int getProtocolVersion();
 
 	static void addVersionInfoToJson(nlohmann::json &);

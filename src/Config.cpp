@@ -6,6 +6,7 @@
 #include "Debugf.h"
 #include "RealTime.h"
 #include <filesystem>
+#include "git.h"
 
 namespace fs = std::filesystem;
 
@@ -113,7 +114,7 @@ std::string Config::getBuildStr() {
 }
 
 std::string Config::getFullStr() {
-	return getModuleStr() + " " + getVersionStr() + " (build: " + getBuildStr() + ")";
+	return std::format("{} {} (build: {} {})", getModuleStr(), getVersionStr(), getBuildStr(), getGitStr());
 }
 
 bool Config::isHexDumpPacketsEnabled() {
@@ -151,5 +152,9 @@ bool Config::isMutexEnabled() {
 
 int Config::getColorMod() {
 	return colorMod;
+}
+
+std::string Config::getGitStr() {
+	return std::format("[{}@{}{}]",  GitMetadata::Branch(), GitMetadata::Describe(), GitMetadata::AnyUncommittedChanges() ? " !!" : "");
 }
 
