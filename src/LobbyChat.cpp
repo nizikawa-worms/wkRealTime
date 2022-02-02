@@ -15,7 +15,7 @@ int __fastcall LobbyChat::hookLobbyClientCommands(void *This, void *EDX, char **
 	std::string command = std::string(commandstrptr[0]);
 	std::string args = std::string(argstrptr[0]);
 
-	if(command == "realtime") {
+	if(command == "realtime" || command == "rt") {
 //		if(args.empty() || args == "list") {
 			std::stringstream ss;
 			ss << addrMyNickname << " is using " << Config::getFullStr();
@@ -31,7 +31,7 @@ int __fastcall LobbyChat::hookLobbyHostCommands(void *This, void *EDX, char **co
 	std::string command = std::string(commandstrptr[0]);
 	std::string args = std::string(argstrptr[0]);
 
-	if(command == "realtime") {
+	if(command == "realtime" || command == "rt") {
 		if(args == "on") {
 			RealTime::setActive(true);
 			lobbyPrint((char*)"Enabled RealTime mode");
@@ -42,6 +42,9 @@ int __fastcall LobbyChat::hookLobbyHostCommands(void *This, void *EDX, char **co
 			lobbyPrint((char*)"Disabled RealTime mode");
 			LobbyProtocol::sendRealTimeStatusToAllPlayers();
 			return 1;
+		} else if(args == "query") {
+			lobbyPrint((char*)"Sending wkRealTime version query to players");
+			LobbyProtocol::sendVersionQueryToAllPlayers();
 		}
 	}
 
