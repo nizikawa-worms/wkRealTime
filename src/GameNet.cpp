@@ -21,7 +21,7 @@ void GameNet::hookGameNetUnknown_c(DWORD ddgame) {
 			TaskMessageFifo * inputFifo = *(TaskMessageFifo**)(ddgame + 0x40);
 			TaskMessageFifo * chatFifo = *(TaskMessageFifo**)(ddgame + 0x28);
 			TaskMessageFifo * networkFifo = *(TaskMessageFifo**)(ddgame + 0x3C);
-			TaskMessageFifo * controlFifo = *(TaskMessageFifo**)(ddgame + 0x50);
+			TaskMessageFifo * replayFifo = *(TaskMessageFifo**)(ddgame + 0x50);
 
 			static unsigned int counter = 0; counter = (counter + 1) % inactiveWormsInterval;
 			sendWormStates(inputFifo, turngame, counter == 0);
@@ -49,15 +49,15 @@ void __stdcall GameNet::gamenetmain_patch1_c(DWORD ddgame) {
 		TaskMessageFifo * inputFifo = *(TaskMessageFifo**)(ddgame + 0x40);
 //		TaskMessageFifo * chatFifo = *(TaskMessageFifo**)(ddgame + 0x28);
 		TaskMessageFifo * networkFifo = *(TaskMessageFifo**)(ddgame + 0x3C);
-//		TaskMessageFifo * controlFifo = *(TaskMessageFifo**)(ddgame + 0x50);
+//		TaskMessageFifo * replayFifo = *(TaskMessageFifo**)(ddgame + 0x50);
 		CTaskTurnGame * turngame = *(CTaskTurnGame**)(ddgame + 0x8);
 
 		GameState gamestate(turngame);
 		TaskMessageFifo::callTaskMessageSend(inputFifo, sizeof(gamestate), Constants::TaskMessage::TaskMessage_GameState, &gamestate);
 		static unsigned int counter = 0; counter = (counter + 1) % inactiveWormsInterval;
 		sendWormStates(inputFifo, turngame, counter == 0);
-		TaskMessageFifo::callCopyFiFo(inputFifo, networkFifo);
-		(*(void (__thiscall **)(DWORD, TaskMessageFifo *))(*(DWORD*)gamenet + 8))(gamenet, networkFifo); // serialize events to network
+//		TaskMessageFifo::callCopyFiFo(inputFifo, networkFifo);
+//		(*(void (__thiscall **)(DWORD, TaskMessageFifo *))(*(DWORD*)gamenet + 8))(gamenet, networkFifo); // serialize events to network
 //		callSendOutOfOrder(gamenet); //sent in gamenetmain_patch2_c
 	}
 }
