@@ -25,11 +25,19 @@ DWORD __fastcall hookFixedCameraCenterAtObject(DWORD posx, DWORD posy, CGameTask
 DWORD (__fastcall *origCameraLookAtMe)(DWORD posx, DWORD posy, CGameTask *object, int priority);
 DWORD __fastcall hookCameraLookAtMe(DWORD posx, DWORD posy, CGameTask *object, int priority) {
 //	debugf("X: %lf Y: %lf Obj: 0x%X priority: %d\n", Utils::fixedToDouble(posx), Utils::fixedToDouble(posy), object, priority);
-	if(RealTime::isActive() && object->classtype == Constants::ClassType_Task_Team) {
-		CTaskTeam * team = (CTaskTeam*)object;
-		if(!team->isOwnedByMe()) {
-//			priority = std::clamp(priority+3, 0, 14);
-			return 0;
+	if(RealTime::isActive()) {
+		switch(object->classtype) {
+			case Constants::ClassType_Task_Team: {
+				CTaskTeam * team = (CTaskTeam*)object;
+				if(!team->isOwnedByMe()) { return 0; }
+				break;
+			}
+			case Constants::ClassType_Task_Worm: {
+				CTaskWorm * worm = (CTaskWorm*)object;
+				if(!worm->isOwnedByMe()) { return 0; }
+				break;
+			}
+			default: break;
 		}
 	}
 
