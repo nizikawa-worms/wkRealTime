@@ -1,4 +1,4 @@
-# wkRealTime v.0.0.6
+# wkRealTime v.0.0.7.0
 _Experimental Worms Armageddon WormKit module that implements real-time online multiplayer for racing schemes._
 
 ## Installation
@@ -28,7 +28,7 @@ The real-time mode can be enabled in two ways:
 ## General notes and bugs
 - This module is in early stage of development and has several limitations and bugs. Real-time should work in both Direct IP and WormNAT2 games, but it's recommended to use Direct IP games for less latency and connectivity issues.
 - The game makes distinction between "turn-holding" and "inactive" teams. In real-time mode all teams have control of worms, but one team is priviledged and holds the turn - it's name and health bar should be flashing in bottom HUD. Certain actions should be only done by the turn-holder team to avoid bugs and disconnects.
-- When placing the worms on game start, only one worm should be placed at a time, according to current turn-holder.
+- When placing the worms on game start, first place all "inactive" worms and place "turn-holding" worm last.
 - To end the round, either close the game with ALT-F4 and rehost or sink all worms except the current turn-holder.
 - Sometimes, players will appear to lose connectivity - they will be able to see worm movement of other teams and read chat, but their chat messages and movement won't be seen by other players. In some cases, their movement and chat will be delayed by several seconds. This is a bug of the module that is more likely to happen when hosting with WormNAT2.
 - All players must use the same version of the module. Players can display their module version by typing **/realtime** in chat.
