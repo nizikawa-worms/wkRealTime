@@ -94,8 +94,8 @@ public:
 	int unknown17C; // 0x17C
 	int unknown180; // 0x180
 	int round_timer_dword184; // 0x184
-	int unknown188; // 0x188
-	int unknown18C; // 0x18C
+	int turn_timer1_unknown188; // 0x188
+	int turn_timer2_unknown18C; // 0x18C
 	int unknown190; // 0x190
 	int unknown194; // 0x194
 	int unknown198; // 0x198
