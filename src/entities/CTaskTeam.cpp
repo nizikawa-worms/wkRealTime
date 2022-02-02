@@ -57,6 +57,12 @@ bool CTaskTeam::isOwnedByMe() {
 	return this->owner_byte40 == mymachine;
 }
 
+bool CTaskTeam::isTurnHolder() {
+	DWORD gameglobal = W2App::getAddrGameGlobal();
+	DWORD currentMachine = *(DWORD*)(gameglobal + 0x726C);
+	return this->owner_byte40 == currentMachine;
+}
+
 bool CTaskTeam::fixCurrentWorm() {
 	if(this == nullptr) return false;
 	int first_worm_number = 0;

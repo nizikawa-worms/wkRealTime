@@ -114,3 +114,8 @@ bool CTaskWorm::isOwnedByMe() {
 	CTaskTeam * team = (CTaskTeam*)this->parent;
 	return team->isOwnedByMe();
 }
+
+bool CTaskWorm::isTurnHolder() {
+	CTaskTeam * team = (CTaskTeam*)this->parent;
+	return team->isTurnHolder();
+}

@@ -283,6 +283,7 @@ public:
 	static int __fastcall hookTeamHandleMessage(CTaskTeam * This, int EDX, CTask * sender, Constants::TaskMessage mtype, size_t size, void * data);
 	bool fixCurrentWorm();
 	bool isOwnedByMe();
+	bool isTurnHolder();
 };
 
 #endif //WKREALTIME_CTASKTEAM_H

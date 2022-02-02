@@ -53,9 +53,9 @@ void __stdcall GameNet::gamenetmain_patch1_c(DWORD ddgame) {
 		CTaskTurnGame * turngame = *(CTaskTurnGame**)(ddgame + 0x8);
 
 		GameState gamestate(turngame);
-		TaskMessageFifo::callTaskMessageSend(inputFifo, sizeof(gamestate), Constants::TaskMessage::TaskMessage_GameState, &gamestate);
+		TaskMessageFifo::callTaskMessageSend(networkFifo, sizeof(gamestate), Constants::TaskMessage::TaskMessage_GameState, &gamestate);
 		static unsigned int counter = 0; counter = (counter + 1) % inactiveWormsInterval;
-		sendWormStates(inputFifo, turngame, counter == 0);
+		sendWormStates(networkFifo, turngame, counter == 0);
 //		TaskMessageFifo::callCopyFiFo(inputFifo, networkFifo);
 //		(*(void (__thiscall **)(DWORD, TaskMessageFifo *))(*(DWORD*)gamenet + 8))(gamenet, networkFifo); // serialize events to network
 //		callSendOutOfOrder(gamenet); //sent in gamenetmain_patch2_c
@@ -110,18 +110,23 @@ void __stdcall GameNet::injectRealtimeFifoEvents() {
 	char myMachine = *(char *) (ddmain + 0xD9DC + 0x40);
 	TaskMessageFifo * inputFifo = *(TaskMessageFifo**)(ddgame + 0x40);
 
-	for(int i=0; i < numMachines; i++) {
-		if(i == currentMachine) continue;
-		if(i == myMachine) continue;
+	for(int machine=0; machine < numMachines; machine++) {
+//		if(machine == currentMachine) continue;
+		if(machine == myMachine) continue;
 
-		TaskMessageFifo * fifo = *(TaskMessageFifo **)(gamenet+0x24 + 0x68 * i);
+		TaskMessageFifo * fifo = *(TaskMessageFifo **)(gamenet+0x24 + 0x68 * machine);
 		if(fifo->data_start_dword14) {
 			int numElements = fifo->num_elements_dword18;
 			for(int n=0; n < numElements; n++) {
+				if(machine == currentMachine) {
+					// only accept WormState and GameState from turn-holding machine
+					TaskMessageEntry * entry = (TaskMessageEntry*) fifo->data_start_dword14;
+					if(entry->type_dword8 != Constants::TaskMessage_WormState && entry->type_dword8 != Constants::TaskMessage::TaskMessage_GameState) break;
+				}
 				size_t msize;
 				int mtype;
 				unsigned char data[2048];
-				callFifoGamenetGetEvent(i, &msize, gamenet, &mtype, (unsigned char*)&data);
+				callFifoGamenetGetEvent(machine, &msize, gamenet, &mtype, (unsigned char*)&data);
 
 				if(mtype == Constants::TaskMessage::TaskMessage_FrameFinish) {
 					break;

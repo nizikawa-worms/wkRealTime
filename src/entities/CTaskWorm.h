@@ -207,6 +207,7 @@ public:
 	static int __fastcall hookWormHandleMessage(CTaskWorm * This, int EDX, CTask * sender, Constants::TaskMessage mtype, size_t size, void * data);
 
 	bool isOwnedByMe();
+	bool isTurnHolder();
 	static void install();
 	int callStartShootingNinjaRope(DWORD a2);
 };
