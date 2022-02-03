@@ -19,7 +19,7 @@ void RealTime::setActive(bool active) {
 
 int RealTime::onChatInput(std::vector<std::string> &parts) {
 	if(parts.size() >= 2) {
-		if(parts[0] == "/realtime" || parts[0] == "rt") {
+		if(parts[0] == "/realtime" || parts[0] == "/rt") {
 			if(parts[1] == "on") setActive(true);
 			else if(parts[1] == "off") setActive(false);
 			Chat::callShowChatMessage(std::format("Realtime: {}", isActive()), 6);
