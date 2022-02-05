@@ -30,6 +30,7 @@ private:
 public:
 	static void install();
 	static void enqueueDebugFifo();
+	static bool isCustomTaskMessage(Constants::TaskMessage mtype);
 };
 
 

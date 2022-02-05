@@ -87,7 +87,7 @@ std::pair<int, int> TaskMessageFifo::enqueueDebugDisplay(std::string name, int x
 		while (fifoentry) {
 //			DWORD size = fifoentry->totalsize_dword0 - 4;
 //			contents += std::format("{}({}) ", fifoentry->type_dword8, size);
-			contents += std::format("{} ", fifoentry->type_dword8);
+			contents += std::format("{} ", (DWORD)fifoentry->type_dword8);
 			fifoentry = fifoentry->nextentry_dword4;
 			i++;
 			if(i > 20) {

@@ -118,10 +118,13 @@ void __stdcall GameNet::injectRealtimeFifoEvents() {
 		if(fifo->data_start_dword14) {
 			int numElements = fifo->num_elements_dword18;
 			for(int n=0; n < numElements; n++) {
+				TaskMessageEntry * entry = (TaskMessageEntry*) fifo->data_start_dword14; // peek at current taskmessage
 				if(machine == currentMachine) {
 					// only accept WormState and GameState from turn-holding machine
-					TaskMessageEntry * entry = (TaskMessageEntry*) fifo->data_start_dword14;
-					if(entry->type_dword8 != Constants::TaskMessage_WormState && entry->type_dword8 != Constants::TaskMessage::TaskMessage_GameState) break;
+					if(!isCustomTaskMessage(entry->type_dword8)) break;
+				} else {
+					// only accept taskmessages in series of WormState|GameState ... FrameFinish or a single FrameFinish
+					if(n == 0 && !isCustomTaskMessage(entry->type_dword8) && entry->type_dword8 != Constants::TaskMessage_FrameFinish) break;
 				}
 				size_t msize;
 				int mtype;
@@ -353,4 +356,8 @@ void GameNet::enqueueDebugFifo() {
 			}
 		}
 	}
+}
+
+bool GameNet::isCustomTaskMessage(Constants::TaskMessage mtype) {
+	return mtype == Constants::TaskMessage_WormState || mtype == Constants::TaskMessage_GameState;
 }

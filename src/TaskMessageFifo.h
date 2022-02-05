@@ -12,7 +12,7 @@ typedef unsigned long       DWORD;
 struct TaskMessageEntry {
 	DWORD totalsize_dword0;
 	TaskMessageEntry * nextentry_dword4;
-	DWORD type_dword8;
+	Constants::TaskMessage type_dword8;
 	unsigned char datac[];
 };
 
