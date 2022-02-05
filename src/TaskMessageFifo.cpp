@@ -132,3 +132,14 @@ DWORD TaskMessageFifo::getSize() {
 	else
 		return end_dword8 - start_dwordC;
 }
+
+void TaskMessageFifo::copyFiFoContents(TaskMessageFifo *src, TaskMessageFifo *dst) {
+	if(src->data_start_dword14) {
+		TaskMessageEntry *entry = (TaskMessageEntry *) src->data_start_dword14;
+		DWORD size = entry->totalsize_dword0 - 4;
+		while (entry) {
+			callTaskMessageSend(dst, size, entry->type_dword8, entry->datac);
+			entry = entry->nextentry_dword4;
+		}
+	}
+}

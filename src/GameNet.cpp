@@ -27,7 +27,7 @@ void GameNet::hookGameNetUnknown_c(DWORD ddgame) {
 			sendWormStates(inputFifo, turngame, counter == 0);
 			turngame->vtable8_HandleMessage(turngame, Constants::TaskMessage::TaskMessage_ProcessInput, 1032, &inputFifo);
 			if(inputFifo->num_elements_dword18 > 0) {
-				TaskMessageFifo::callCopyFiFo(inputFifo, networkFifo);
+				TaskMessageFifo::copyFiFoContents(inputFifo, networkFifo);
 				TaskMessageFifo::callTaskMessageSend(networkFifo, 0, Constants::TaskMessage::TaskMessage_FrameFinish, 0);
 				DWORD gamenet = W2App::getAddrWsGameNet();
 				(*(void (__thiscall **)(DWORD, TaskMessageFifo *))(*(DWORD*)gamenet + 8))(gamenet, networkFifo); // serialize events to network
@@ -56,7 +56,7 @@ void __stdcall GameNet::gamenetmain_patch1_c(DWORD ddgame) {
 		TaskMessageFifo::callTaskMessageSend(networkFifo, sizeof(gamestate), Constants::TaskMessage::TaskMessage_GameState, &gamestate);
 		static unsigned int counter = 0; counter = (counter + 1) % inactiveWormsInterval;
 		sendWormStates(networkFifo, turngame, counter == 0);
-//		TaskMessageFifo::callCopyFiFo(inputFifo, networkFifo);
+//		TaskMessageFifo::copyFiFoContents(inputFifo, networkFifo);
 //		(*(void (__thiscall **)(DWORD, TaskMessageFifo *))(*(DWORD*)gamenet + 8))(gamenet, networkFifo); // serialize events to network
 //		callSendOutOfOrder(gamenet); //sent in gamenetmain_patch2_c
 	}

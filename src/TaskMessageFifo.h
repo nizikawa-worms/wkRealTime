@@ -38,6 +38,7 @@ public:
 	DWORD num_elements_dword18; //number of elements
 
 	static int callCopyFiFo(TaskMessageFifo * src, TaskMessageFifo * dst);
+	static void copyFiFoContents(TaskMessageFifo * src, TaskMessageFifo * dst);
 	static int callFifoMakeSpace(TaskMessageFifo * fifo, size_t tsize);
 	static DWORD callTaskMessageSend(TaskMessageFifo * fifo, DWORD msize, Constants::TaskMessage mtype, void * data);
 	static std::map<TaskMessageFifo*, std::unique_ptr<FifoDebugDisplay>> debugFifoTextboxes;
