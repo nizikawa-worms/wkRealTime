@@ -2,7 +2,6 @@
 #include <cstdio>
 #include <fstream>
 #include <sstream>
-#include <zlib/zlib.h>
 #include <Base64.h>
 /*
  * Copyright 2018 Dominik Liebler

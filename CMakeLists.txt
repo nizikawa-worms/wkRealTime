@@ -10,7 +10,7 @@ add_subdirectory(lib/hacklib-patternscanner)
 
 set(POLYHOOK_BUILD_STATIC_RUNTIME)
 add_subdirectory(lib/PolyHook_2_0)
-include_directories(include lib/hacklib-patternscanner)
+include_directories(include lib/hacklib-patternscanner lib/PolyHook_2_0 lib/PolyHook_2_0/capstone/include)
 
 set(PRE_CONFIGURE_FILE "cmake/git.cc.in")
 set(POST_CONFIGURE_FILE "${CMAKE_CURRENT_BINARY_DIR}/gen/git.cc")
