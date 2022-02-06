@@ -1,2 +1,4 @@
 cmake-*
 .idea*
+bundle/wkZRealTime.dll
+wkRealTime/
