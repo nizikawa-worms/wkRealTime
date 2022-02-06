@@ -10,6 +10,10 @@ add_library(hacklib STATIC
         lib/hacklib/ExeFile.cpp lib/hacklib/ExeFile_WIN32.cpp
         lib/hacklib/PatternScanner.cpp lib/hacklib/Memory_WIN32.cpp)
 
+set(POLYHOOK_BUILD_STATIC_RUNTIME)
+add_subdirectory(lib/PolyHook_2_0)
+link_directories(${CMAKE_CURRENT_BINARY_DIR}/lib/PolyHook_2_0)
+
 link_directories(lib)
 include_directories(include lib/hacklib)
 
@@ -53,7 +57,8 @@ add_library(wkRealTime SHARED
         src/Drawing.cpp src/Drawing.h
         ${CMAKE_CURRENT_BINARY_DIR}/resource.rc
 )
+add_dependencies(wkRealTime PolyHook_2)
 
 target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_CURRENT_BINARY_DIR}/gen)
 set_property(TARGET wkRealTime hacklib git PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
-target_link_libraries(wkRealTime hacklib capstone Polyhook_2 version libz-static git)
+target_link_libraries(wkRealTime hacklib PolyHook_2 version libz-static git)
