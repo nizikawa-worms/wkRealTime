@@ -10,7 +10,6 @@
 #include <optional>
 #include <fstream>
 #include <sstream>
-#include <Base64.h>
 #include "Utils.h"
 #include "Debugf.h"
 #include "Hooks.h"

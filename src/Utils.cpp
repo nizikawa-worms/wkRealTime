@@ -1,8 +1,6 @@
 #include "Utils.h"
 #include <cstdio>
 #include <fstream>
-#include <sstream>
-#include <Base64.h>
 /*
  * Copyright 2018 Dominik Liebler
 
