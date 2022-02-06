@@ -26,7 +26,8 @@ public:
   static std::string CommitBody();
   // The commit describe.
   static std::string Describe();
-  // The commir branch
+  // The commit branch
   static std::string Branch();
-
+  // Uncommited Modified files
+  static std::string ChangedFiles();
 };

@@ -88,6 +88,7 @@ set(_state_variable_names
     GIT_COMMIT_BODY
     GIT_DESCRIBE
     GIT_BRANCH
+    GIT_CHANGED_FILES
     # >>>
     # 1. Add the name of the additional git variable you're interested in monitoring
     #    to this list.
@@ -198,6 +199,16 @@ function(GetGitState _working_dir)
     RunGitCommand(rev-parse --abbrev-ref HEAD)
     if(exit_code EQUAL 0)
         set(ENV{GIT_BRANCH} "${output}")
+    else()
+        set(ENV{GIT_BRANCH} "???")
+    endif()
+
+    RunGitCommand(diff --name-status)
+    if(exit_code EQUAL 0)
+        string(REPLACE "\n" ";" safe ${output})
+        set(ENV{GIT_CHANGED_FILES} "${safe}")
+    else()
+        set(ENV{GIT_CHANGED_FILES} "???")
     endif()
 
 endfunction()

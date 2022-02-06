@@ -155,6 +155,6 @@ int Config::getColorMod() {
 }
 
 std::string Config::getGitStr() {
-	return std::format("[{}@{}{}]",  GitMetadata::Branch(), GitMetadata::Describe(), GitMetadata::AnyUncommittedChanges() ? " !!" : "");
+	return std::format("[{}@{}{}{}]",  GitMetadata::Branch(), GitMetadata::Describe(), GitMetadata::AnyUncommittedChanges() ? " !!" : "", GitMetadata::ChangedFiles());
 }
 

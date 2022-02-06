@@ -31,3 +31,7 @@ std::string GitMetadata::Describe() {
 std::string GitMetadata::Branch() {
     return "@GIT_BRANCH@";
 }
+
+std::string GitMetadata::ChangedFiles() {
+    return "@GIT_CHANGED_FILES@";
+}
