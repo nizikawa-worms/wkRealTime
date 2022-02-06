@@ -24,7 +24,7 @@ void Hooks::hook(std::string name, DWORD pTarget, DWORD *pDetour, DWORD *ppOrigi
 	}
 
 	uint64_t trampoline = 0;
-	auto detour = std::make_unique<PLH::x86Detour>(pTarget, (const uint64_t)pDetour, &trampoline, dis);
+	auto detour = std::make_unique<PLH::x86Detour>(pTarget, (const uint64_t)pDetour, &trampoline, dis, polyhook_maxDepth);
 	if(!detour->hook()) {
 		throw std::runtime_error("Failed to create hook: " + name);
 	}

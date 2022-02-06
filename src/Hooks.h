@@ -22,6 +22,7 @@ private:
 		std::string original;
 		~PatchInfo() {PatchMemData((PVOID)addr, original.size(), (PVOID)original.data(), original.size());}
 	};
+	static const int polyhook_maxDepth = 20;
 
 	static inline const std::string cacheFile = PROJECT_NAME ".cache";
 	static inline std::map<std::string, DWORD> hookNameToAddr;
