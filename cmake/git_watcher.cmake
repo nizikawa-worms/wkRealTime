@@ -205,7 +205,16 @@ function(GetGitState _working_dir)
 
     RunGitCommand(diff --name-status)
     if(exit_code EQUAL 0)
-        string(REPLACE "\n" ";" safe ${output})
+        if(output)
+            # Escape line breaks in the commit message.
+            string(REPLACE "\r\n" ";" safe ${output})
+            if(safe STREQUAL output)
+                # Didn't have windows lines - try unix lines.
+                string(REPLACE "\n" ";" safe ${output})
+            endif()
+        else()
+            set(safe "")
+        endif()
         set(ENV{GIT_CHANGED_FILES} "${safe}")
     else()
         set(ENV{GIT_CHANGED_FILES} "???")
