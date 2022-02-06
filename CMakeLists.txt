@@ -61,4 +61,4 @@ add_dependencies(wkRealTime PolyHook_2)
 
 target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_CURRENT_BINARY_DIR}/gen)
 set_property(TARGET wkRealTime hacklib git PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
-target_link_libraries(wkRealTime hacklib PolyHook_2 version libz-static git)
+target_link_libraries(wkRealTime hacklib PolyHook_2 version git)
