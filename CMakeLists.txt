@@ -6,16 +6,11 @@ project(wkRealTime
 
 set(CMAKE_CXX_STANDARD 23)
 
-add_library(hacklib STATIC
-        lib/hacklib/ExeFile.cpp lib/hacklib/ExeFile_WIN32.cpp
-        lib/hacklib/PatternScanner.cpp lib/hacklib/Memory_WIN32.cpp)
+add_subdirectory(lib/hacklib-patternscanner)
 
 set(POLYHOOK_BUILD_STATIC_RUNTIME)
 add_subdirectory(lib/PolyHook_2_0)
-link_directories(${CMAKE_CURRENT_BINARY_DIR}/lib/PolyHook_2_0)
-
-link_directories(lib)
-include_directories(include lib/hacklib)
+include_directories(include lib/hacklib-patternscanner)
 
 set(PRE_CONFIGURE_FILE "cmake/git.cc.in")
 set(POST_CONFIGURE_FILE "${CMAKE_CURRENT_BINARY_DIR}/gen/git.cc")
@@ -60,5 +55,5 @@ add_library(wkRealTime SHARED
 add_dependencies(wkRealTime PolyHook_2)
 
 target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_CURRENT_BINARY_DIR}/gen)
-set_property(TARGET wkRealTime hacklib git PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
-target_link_libraries(wkRealTime hacklib PolyHook_2 version git)
+set_property(TARGET wkRealTime hacklib-patternscanner git PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
+target_link_libraries(wkRealTime hacklib-patternscanner PolyHook_2 version git)

@@ -1,3 +1,6 @@
 [submodule "lib/PolyHook_2_0"]
 	path = lib/PolyHook_2_0
 	url = https://github.com/stevemk14ebr/PolyHook_2_0.git
+[submodule "lib/hacklib-patternscanner"]
+	path = lib/hacklib-patternscanner
+	url = https://github.com/nizikawa-worms/hacklib-patternscanner.git
