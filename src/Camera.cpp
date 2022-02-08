@@ -10,12 +10,13 @@
 #include "W2App.h"
 
 DWORD (__fastcall *origFixedCameraCenterAtObject)(DWORD posx, DWORD posy, CGameTask *object);
-DWORD __fastcall hookFixedCameraCenterAtObject(DWORD posx, DWORD posy, CGameTask *object) {
+DWORD __fastcall Camera::hookFixedCameraCenterAtObject(DWORD posx, DWORD posy, CGameTask *object) {
 	if(RealTime::isActive() && object->classtype == Constants::ClassType_Task_Team) {
 		CameraFixedLookAt * cameraFixedLookAt = (CameraFixedLookAt*)(object->gameglobal2c + 0x739C);
 		cameraFixedLookAt->enabled = 1;
 		CTaskTeam * team = (CTaskTeam*)object;
-		if(!team->isOwnedByMe()) {
+
+		if((followingTeam == 0 && !team->isOwnedByMe()) || (followingTeam > 0 && followingTeam != team->team_number_dword38)) {
 			return 0;
 		}
 	}
@@ -49,6 +50,18 @@ void Camera::install() {
 	DWORD addrCameraLookAtMe = _ScanPattern("CameraLookAtMe", "\x8B\x44\x24\x04\x8B\x40\x2C\x83\xB8\x00\x00\x00\x00\x00\x56\x8B\x74\x24\x0C\x75\x4A\x8D\x34\xB6\x83\xBC\xB0\x00\x00\x00\x00\x00\x8D\x84\xB0\x00\x00\x00\x00\x75\x16\x89\x48\x0C\x89\x48\x04\x89\x50\x08", "??????xxx?????xxxxxxxxxxxxx?????xxx????xxxxxxxxxxx");
 	_HookDefault(FixedCameraCenterAtObject);
 	_HookDefault(CameraLookAtMe);
+}
+
+int Camera::getFollowingTeam() {
+	return followingTeam;
+}
+
+void Camera::setFollowingTeam(int followingTeam) {
+	Camera::followingTeam = followingTeam;
+}
+
+void Camera::onConstructGameGlobal() {
+	Camera::followingTeam = 0;
 }
 
 void CameraFixedLookAt::print() {

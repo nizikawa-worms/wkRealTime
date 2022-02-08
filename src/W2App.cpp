@@ -5,6 +5,7 @@
 #include "RealTime.h"
 #include "Drawing.h"
 #include "TaskMessageFifo.h"
+#include "Camera.h"
 
 DWORD origInitializeW2App;
 DWORD __stdcall W2App::hookInitializeW2App(DWORD DD_Game_a2, DWORD DD_Display_a3, DWORD DS_Sound_a4, DWORD DD_Keyboard_a5, DWORD DD_Mouse_a6, DWORD WAV_CDrom_a7, DWORD WS_GameNet_a8) {
@@ -41,6 +42,7 @@ DWORD __stdcall W2App::hookConstructGameGlobal(DWORD ddgame) {
 	auto ret = origConstructGameGlobal(ddgame);
 	addrGameGlobal = *(DWORD*)(ddgame + 0x488);
 
+	Camera::onConstructGameGlobal();
 	Drawing::onConstructGameGlobal();
 
 	return ret;

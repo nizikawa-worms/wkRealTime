@@ -4,6 +4,7 @@
 #include "RealTime.h"
 #include "Chat.h"
 #include "Config.h"
+#include "Camera.h"
 
 
 void RealTime::install() {
@@ -34,14 +35,26 @@ int RealTime::onChatInput(std::vector<std::string> &parts) {
 		}
 		if(parts[0] == "/ghosts") {
 			try {
-				unsigned int choice = std::stoi(parts[1]);
-				if(choice <= 4) {
+				int choice = std::stoi(parts[1]);
+				if(choice >= 0 && choice <= 4) {
 					Config::setGhosts(choice);
 					Chat::callShowChatMessage(std::format("GhostWorms: {}", Config::getGhosts()), 6);
 					return 1;
 				} else throw std::runtime_error(std::format("Unknown choice: {}", choice));
 			} catch(std::exception & e) {
 				Chat::callShowChatMessage(std::format("GhostWorms: {}", e.what()), 6);
+			}
+		}
+		if(parts[0] == "/follow") {
+			try {
+				int choice = std::stoi(parts[1]);
+				if(choice >= 0 && choice <= 6) {
+					Camera::setFollowingTeam(choice);
+					Chat::callShowChatMessage(std::format("CameraFollow: following team: {}{}", Camera::getFollowingTeam(), Camera::getFollowingTeam() == 0 ? " (automatic)" : ""), 6);
+					return 1;
+				} else throw std::runtime_error(std::format("Unknown choice: {}", choice));
+			} catch(std::exception & e) {
+				Chat::callShowChatMessage(std::format("CameraFollow: {}", e.what()), 6);
 			}
 		}
 	}
