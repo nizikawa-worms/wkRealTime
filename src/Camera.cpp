@@ -34,7 +34,7 @@ DWORD __fastcall hookCameraLookAtMe(DWORD posx, DWORD posy, CGameTask *object, i
 			}
 			case Constants::ClassType_Task_Worm: {
 				CTaskWorm * worm = (CTaskWorm*)object;
-				if(!worm->isOwnedByMe()) { return 0; }
+				if(!worm->isOwnedByMe() || worm->suspended_physics_dword48) { return 0; }
 				break;
 			}
 			default: break;
