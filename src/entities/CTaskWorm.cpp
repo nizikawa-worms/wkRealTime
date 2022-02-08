@@ -9,26 +9,39 @@
 
 int (__fastcall *origWormHandleMessage)(CTaskWorm * This, int EDX, CTask * sender, Constants::TaskMessage mtype, size_t size, void * data);
 int __fastcall CTaskWorm::hookWormHandleMessage(CTaskWorm * This, int EDX, CTask * sender, Constants::TaskMessage mtype, size_t size, void * data) {
-	switch(mtype){
+	switch(mtype) {
 		case Constants::TaskMessage_FrameFinish:
-			if(This->selected_weapon_entry_ptr36C == 0) {
+			if (This->selected_weapon_entry_ptr36C == 0) {
 				DWORD gameglobal = W2App::getAddrGameGlobal();
-				DWORD weaponTable = *(DWORD*)(gameglobal + 0x510);
+				DWORD weaponTable = *(DWORD *) (gameglobal + 0x510);
 				This->selected_weapon_entry_ptr36C = weaponTable + 464 * This->selected_weapon_unknown170;
 			}
 			break;
-		case Constants::TaskMessage_RenderScene:
-			if(Config::getColorMod() == 2 || (Config::getColorMod() == 1 && RealTime::isActive())){
+		case Constants::TaskMessage_RenderScene: {
+			if (RealTime::isActive() && !This->isOwnedByMe()) {
+				switch(Config::getGhosts()) {
+					case 1: Drawing::setSpriteMask(0x4000000); break;
+					case 2: Drawing::setSpriteMask(0x200000); break;
+					case 3: Drawing::setSpriteMask(0x8000000); break;
+					case 4: Drawing::setSpriteMask(0x10000000); break;
+					default: break;
+				}
+			}
+			int retVal = 0; DWORD *colors = nullptr; DWORD oldColor = 0;
+			if (Config::getColorMod() == 2 || (Config::getColorMod() == 1 && RealTime::isActive())) {
 				// This enables ColorMod (originally from RubberWorm)
 				DWORD gameglobal = W2App::getAddrGameGlobal();
-				DWORD *colors = (DWORD*)(gameglobal + 0x72D8 + 0x30); // 0x7248 in 3.7.2
-				DWORD oldColor = colors[7];
+				colors = (DWORD *) (gameglobal + 0x72D8 + 0x30); // 0x7248 in 3.7.2
+				oldColor = colors[7];
 				colors[7] = colors[This->color_dword10C + 1];
-				int retVal = origWormHandleMessage(This, EDX, sender, mtype, size, data);
-				colors[7] = oldColor;
-				return retVal;
 			}
-			break;
+
+			retVal = origWormHandleMessage(This, EDX, sender, mtype, size, data);
+
+			if(colors) colors[7] = oldColor;
+			if(Config::getGhosts()) Drawing::setSpriteMask(0);
+			return retVal;
+		}
 		case Constants::TaskMessage_WormState: {
 			WormState *state = (WormState *) data;
 			state->apply(This);

@@ -65,18 +65,35 @@ int __stdcall Drawing::hookTurnGameRenderScene() {
 }
 
 
-DWORD origDrawSpriteLocal;
-void Drawing::callDrawSpriteLocal(int posy, int layer, int posx, int sprite, int frame) {
-	DWORD gamescene = *(DWORD*)(W2App::getAddrGameGlobal() + 0x524);
+
+//_DWORD *__userpurge draw_sprite_local_sub_542060@<eax>(
+//        _DWORD *posy_result@<eax>,
+//        _DWORD *gamescene_a2@<ecx>,
+//        int layer_a3,
+//        int posx_a4,
+//        int sprite_id_a5,
+//        int frame_a6)
+//{
+
+DWORD (__stdcall *origDrawSpriteLocal)(DWORD layer, DWORD posx, DWORD sprite, DWORD frame);
+DWORD __stdcall Drawing::hookDrawSpriteLocal(DWORD layer, DWORD posx, DWORD sprite, DWORD frame) {
+	DWORD posy, gamescene, retv;
+	_asm mov posy, eax
+	_asm mov gamescene, ecx
+
+	sprite |= spriteMask;
+
 	_asm push frame
 	_asm push sprite
 	_asm push posx
 	_asm push layer
-	_asm mov ecx, gamescene
 	_asm mov eax, posy
+	_asm mov ecx, gamescene
 	_asm call origDrawSpriteLocal
-}
+	_asm mov retv, eax
 
+	return retv;
+}
 
 void Drawing::install() {
 	DWORD addrTextboxSetText = Hooks::scanPattern("TextboxSetText", "\x6A\xFF\x68\x00\x00\x00\x00\x64\xA1\x00\x00\x00\x00\x50\x8B\x44\x24\x18\x64\x89\x25\x00\x00\x00\x00\x83\xEC\x10\x53\x8B\x5C\x24\x24\x3B\x83\x00\x00\x00\x00\x55", "???????xx????xxxxxxxx????xxxxxxxxxx????x");
@@ -86,18 +103,22 @@ void Drawing::install() {
 														 "??????x????xxxxxxxxxxxxxxxxxxxxxxxx????xx????xxx????xxxxxxx????xxxxxxxx????xx????xxxxxxxxxxxxxxxxxxxxxxxxxxxx");
 	DWORD addrTurnGameRenderScene = Hooks::scanPattern("TurnGameRenderScene", "\x83\xEC\x28\x8B\x47\x2C\x8B\x48\x24\x8B\x91\x00\x00\x00\x00\x85\xD2\x53\x8B\x98\x00\x00\x00\x00\x55\x8B\xA8\x00\x00\x00\x00\x56\x89\x5C\x24\x1C\x89\x6C\x24\x20\x7E\x4E", "??????xxxxx????xxxxx????xxx????xxxxxxxxxxx");
 	DWORD origDrawSpriteGlobal = Hooks::scanPattern("DrawSpriteGlobal", "\x8B\x91\x00\x00\x00\x00\x81\xFA\x00\x00\x00\x00\x56\x57\x8B\x7C\x24\x10\x8B\xF0\x7D\x5B\x8B\x01\x83\xC0\xE8\x78\x54\x89\x01\x8D\x44\x08\x04\x89\x84\x91\x00\x00\x00\x00\x8B\x91\x00\x00\x00\x00", "??????xx????xxxxxxxxxxxxxxxxxxxxxxxxxx????xx????", 0x541FE0);
-	origDrawSpriteLocal = origDrawSpriteGlobal + (0x541BA0 - 0x541B20);
+	DWORD addrDrawSpriteLocal = origDrawSpriteGlobal + (0x541BA0 - 0x541B20);
 
 	_HookDefault(TextboxSetText);
 	_HookDefault(TurnGameRenderScene);
 	_HookDefault(DrawBitmapImageScreen);
+	_HookDefault(DrawSpriteLocal);
 }
 
 void Drawing::onConstructGameGlobal() {
-	framenumber = std::make_unique<BitmapTextbox>();
+	spriteMask = 0;
 }
 
 void Drawing::onDestructGameGlobal() {
-	framenumber = nullptr;
+}
+
+void Drawing::setSpriteMask(DWORD spriteMask) {
+	Drawing::spriteMask = spriteMask;
 }
 

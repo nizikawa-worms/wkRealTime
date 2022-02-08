@@ -21,6 +21,7 @@ void Config::readConfig() {
 	ignoreVersionCheck = GetPrivateProfileIntA("general", "IgnoreVersionCheck", 0, inipath.c_str());
 
 	colorMod = GetPrivateProfileIntA("general", "ColorMod", 1, inipath.c_str());
+	ghosts = GetPrivateProfileIntA("general", "GhostWorms", 1, inipath.c_str());
 
 	devConsoleEnabled = GetPrivateProfileIntA("debug", "EnableDevConsole", 0, inipath.c_str());
 	hexDumpPackets = GetPrivateProfileIntA("debug", "HexDumpPackets", 0, inipath.c_str());
@@ -156,5 +157,13 @@ int Config::getColorMod() {
 
 std::string Config::getGitStr() {
 	return std::format("[{}@{}{}]",  GitMetadata::Branch(), GitMetadata::Describe(), GitMetadata::AnyUncommittedChanges() ? " !!" : "");
+}
+
+unsigned int Config::getGhosts() {
+	return ghosts;
+}
+
+void Config::setGhosts(unsigned int ghosts) {
+	Config::ghosts = ghosts;
 }
 

@@ -25,6 +25,7 @@ private:
 
 	static inline bool logToFile = false;
 	static inline int colorMod = 0;
+	static inline unsigned int ghosts = 0;
 public:
 
 	static void readConfig();
@@ -53,6 +54,9 @@ public:
 	static std::string getWaVersionAsString();
 
 	static int getColorMod();
+
+	static unsigned int getGhosts();
+	static void setGhosts(unsigned int ghosts);
 };
 
 

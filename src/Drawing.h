@@ -159,15 +159,15 @@ private:
 	static void hookTurnGameRenderScene_c();
 	static int __stdcall hookTurnGameRenderScene();
 
-	static inline std::unique_ptr<BitmapTextbox> banner = nullptr;
-	static inline std::unique_ptr<BitmapTextbox> framenumber = nullptr;
-
+	static DWORD __stdcall hookDrawSpriteLocal(DWORD layer, DWORD posx, DWORD sprite, DWORD frame);
+	static inline DWORD spriteMask = 0;
 public:
 	static BitmapImage * __stdcall hookTextboxSetText(BitmapTextbox * box, char *text, int text_color, int color1, int color2, int * width, int *height, int opacity);
-	static void callDrawSpriteLocal(int posy, int layer, int posx, int sprite, int frame);
 	static void onConstructGameGlobal();
 	static void onDestructGameGlobal();
 	static void install();
+
+	static void setSpriteMask(DWORD spriteMask);
 };
 
 

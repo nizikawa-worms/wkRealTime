@@ -3,6 +3,7 @@
 #include <format>
 #include "RealTime.h"
 #include "Chat.h"
+#include "Config.h"
 
 
 void RealTime::install() {
@@ -30,6 +31,18 @@ int RealTime::onChatInput(std::vector<std::string> &parts) {
 			else if(parts[1] == "off") setDebugFifo(false);
 			Chat::callShowChatMessage(std::format("DebugFifo: {}", isDebugFifo()), 6);
 			return 1;
+		}
+		if(parts[0] == "/ghosts") {
+			try {
+				unsigned int choice = std::stoi(parts[1]);
+				if(choice <= 4) {
+					Config::setGhosts(choice);
+					Chat::callShowChatMessage(std::format("GhostWorms: {}", Config::getGhosts()), 6);
+					return 1;
+				} else throw std::runtime_error(std::format("Unknown choice: {}", choice));
+			} catch(std::exception & e) {
+				Chat::callShowChatMessage(std::format("GhostWorms: {}", e.what()), 6);
+			}
 		}
 	}
 	return 0;
