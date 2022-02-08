@@ -20,10 +20,11 @@ int __stdcall callOriginalOnChatInput(int a1, char * msg, int a3) {
 
 int Chat::onChatInput(int a1, char * msgc, int a3) {
 	std::string msg(msgc);
-	std::vector<std::string> parts;
-	Utils::tokenize(msg, " ", parts);
-	if(RealTime::onChatInput(parts)) return 1;
-
+	if(msg.starts_with("/")) {
+		std::vector<std::string> parts;
+		Utils::tokenize(msg, " ", parts);
+		if (RealTime::onChatInput(parts)) return 1;
+	}
 	return 0;
 }
 
