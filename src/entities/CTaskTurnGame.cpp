@@ -14,11 +14,20 @@ int (__fastcall *origTurnHandleMessage)(CTaskTurnGame * This, int EDX, CTask * s
 int __fastcall CTaskTurnGame::hookTurnHandleMessage(CTaskTurnGame * This, int EDX, CTask * sender, Constants::TaskMessage mtype, size_t size, void * data) {
 	if (RealTime::isActive() && This->its_before_round_start_dword140) {
 		if(mtype == Constants::TaskMessage::TaskMessage_WeaponFinished) {
-			// prevent other worms from ending turn in manual placement mode
-			auto wfdata = (struct WeaponFinishedData *) data;
-			if (wfdata->team != This->current_team_1_unknown12C) {
-				debugf("Ignoring WeaponFinished caused by team %d - current team: %d\n", wfdata->team, This->current_team_1_unknown12C);
-				return 0;
+			// ignore WeaponFinished caused by teleport until all worms are placed on map
+			auto * wfdata = (WeaponFinishedData*)data;
+			if(wfdata->weapon == Constants::Weapon_Teleport) {
+				int count = 0;
+				This->traverse([&](CTask *obj, const int level) {
+					if (obj->classtype == Constants::ClassType_Task_Worm) {
+						CTaskWorm *worm = (CTaskWorm *) obj;
+						if (worm->suspended_physics_dword48) count++;
+					}
+				});
+				if(count > 1) {
+					debugf("ignoring WeaponFinished because there are still worms in manual placement mode, count: %d\n", count);
+					return 0;
+				}
 			}
 		} else if(mtype == Constants::TaskMessage_FrameFinish) {
 			This->turn_timer1_unknown188 = 999 * 1000;

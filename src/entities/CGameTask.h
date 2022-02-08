@@ -27,7 +27,7 @@ public:
 	int unknown3C; // 0x3C
 	int unknown40; // 0x40
 	int state_dword44; // 0x44
-	int unknown48; // 0x48
+	int suspended_physics_dword48; // 0x48
 	int unknown4C; // 0x4C
 	int unknown50; // 0x50
 	int unknown54; // 0x54
