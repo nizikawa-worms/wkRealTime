@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.17)
 project(wkRealTime
-        VERSION "0.0.7.1"
+        VERSION "0.0.8.0"
         DESCRIPTION "Real-time network multiplayer for racing schemes"
         )
 
