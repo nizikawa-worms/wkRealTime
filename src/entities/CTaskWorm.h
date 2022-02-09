@@ -205,7 +205,7 @@ public:
 	int unknown3F8; // 0x3F8
 
 	static int __fastcall hookWormHandleMessage(CTaskWorm * This, int EDX, CTask * sender, Constants::TaskMessage mtype, size_t size, void * data);
-	static inline std::map<unsigned char, DWORD> colorModValues = {{7,0}};
+	static inline std::map<unsigned char, DWORD> colorModValues = {{7,0}, {9,0}};
 	bool isOwnedByMe();
 	bool isTurnHolder();
 	static void install();
