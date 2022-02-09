@@ -5,6 +5,7 @@
 #include "Chat.h"
 #include "Config.h"
 #include "Camera.h"
+#include "src/entities/CTaskWorm.h"
 
 
 void RealTime::install() {
@@ -55,6 +56,26 @@ int RealTime::onChatInput(std::vector<std::string> &parts) {
 				} else throw std::runtime_error(std::format("Unknown choice: {}", choice));
 			} catch(std::exception & e) {
 				Chat::callShowChatMessage(std::format("CameraFollow: {}", e.what()), 6);
+			}
+		}
+		if(parts.size() >= 3 && parts[0] == "/colormod") {
+			try {
+				int choice = std::stoi(parts[2]);
+				if(choice >= 0 && choice <= 255) {
+					if(parts[1] == "add") {
+						CTaskWorm::colorModValues[choice] = 0;
+					} else if(parts[1] == "del") {
+						CTaskWorm::colorModValues.erase(choice);
+					}
+					std::string msg = "Colormod color ids: ";
+					for(auto & it : CTaskWorm::colorModValues) {
+						msg += std::format("{} ", it.first);
+					}
+					Chat::callShowChatMessage(msg, 6);
+					return 1;
+				} else throw std::runtime_error(std::format("Unknown choice: {}", choice));
+			} catch(std::exception & e) {
+				Chat::callShowChatMessage(std::format("ColorMod: {}", e.what()), 6);
 			}
 		}
 	}

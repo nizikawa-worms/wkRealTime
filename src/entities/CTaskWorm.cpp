@@ -32,13 +32,20 @@ int __fastcall CTaskWorm::hookWormHandleMessage(CTaskWorm * This, int EDX, CTask
 				// This enables ColorMod (originally from RubberWorm)
 				DWORD gameglobal = W2App::getAddrGameGlobal();
 				colors = (DWORD *) (gameglobal + 0x72D8 + 0x30); // 0x7248 in 3.7.2
-				oldColor = colors[7];
-				colors[7] = colors[This->color_dword10C + 1];
+
+				for(auto & it : colorModValues) {
+					it.second = colors[it.first];
+					colors[it.first] = colors[This->color_dword10C + 1];
+				}
 			}
 
 			retVal = origWormHandleMessage(This, EDX, sender, mtype, size, data);
 
-			if(colors) colors[7] = oldColor;
+			if(colors) {
+				for(auto & it : colorModValues) {
+					colors[it.first] = it.second;
+				}
+			}
 			if(Config::getGhosts()) Drawing::setSpriteMask(0);
 			return retVal;
 		}
