@@ -120,7 +120,7 @@ void LobbyProtocol::sendVersionQueryToAllPlayers() {
 	json["type"] = "VersionQuery";
 	Config::addVersionInfoToJson(json);
 	std::string dump = json.dump();
-	for(int i=0; i < LobbyPackets::numSlots; i++) {
+	for(int i=0; i < LobbyPackets::getNumSlots(); i++) {
 		LobbyPackets::sendDataToClient_slot(i, dump);
 	}
 }
@@ -144,7 +144,7 @@ void LobbyProtocol::sendRealTimeStatusToAllPlayers() {
 	json["enabled"] = RealTime::isActive();
 	Config::addVersionInfoToJson(json);
 	std::string dump = json.dump();
-	for(int i=0; i < LobbyPackets::numSlots; i++) {
+	for(int i=0; i < LobbyPackets::getNumSlots(); i++) {
 		LobbyPackets::sendDataToClient_slot(i, dump);
 	}
 }

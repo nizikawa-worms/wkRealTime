@@ -9,7 +9,6 @@
 typedef unsigned long       DWORD;
 class LobbyPackets {
 public:
-	static const int numSlots = 6;
 	static const unsigned short int gameStartPacketID = 0x1c;
 private:
 	static inline DWORD addrClientSlot;
@@ -24,7 +23,7 @@ private:
 	static int __fastcall hookClientEndscreenPacketHandler(DWORD This, DWORD EDX, unsigned char * packet, size_t size);
 	static int __fastcall hookInternalSendPacket(DWORD This, DWORD EDX, unsigned char * packet, size_t size);
 
-
+	static inline DWORD addrHostIncomingConnection;
 public:
 	static void sendDataToClient_connection(DWORD connection, std::string msg);
 	static int sendDataToClient_slot(DWORD slot, std::string msg);
@@ -38,6 +37,7 @@ public:
 	static std::string getNicknameBySlot(int slot);
 
 	static void sendMessage(DWORD connection, const std::string & message);
+	static int getNumSlots();
 };
 
 
