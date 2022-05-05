@@ -1,4 +1,4 @@
-# wkRealTime v.0.0.8.0
+# wkRealTime v.0.0.8.1
 _Experimental Worms Armageddon WormKit module that implements real-time online multiplayer for racing schemes._
 
 ## Installation
@@ -34,4 +34,3 @@ The real-time mode can be enabled in two ways:
 - All players must use the same version of the module. Players can display their module version by typing **/realtime** in chat.
 - When using teleport for the first time in round, the camera will be broken. Mouse cursor movement of other players is not visible.
 - Replays recorded by the game in real-time mode are currently broken.
-- The module is not compatible with wkBigLobby.
