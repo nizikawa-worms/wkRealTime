@@ -50,8 +50,8 @@ add_library(wkRealTime SHARED
         src/GameNet.cpp src/GameNet.h
         src/Camera.cpp src/Camera.h
         src/Drawing.cpp src/Drawing.h
-        ${CMAKE_CURRENT_BINARY_DIR}/resource.rc
-)
+        src/WeaponPanel.cpp src/WeaponPanel.h
+        ${CMAKE_CURRENT_BINARY_DIR}/resource.rc)
 add_dependencies(wkRealTime PolyHook_2)
 
 target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_CURRENT_BINARY_DIR}/gen)

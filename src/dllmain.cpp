@@ -24,6 +24,7 @@
 #include "GameNet.h"
 #include "Camera.h"
 #include "Drawing.h"
+#include "WeaponPanel.h"
 
 void install() {
 	srand(time(0) * GetCurrentProcessId());
@@ -44,6 +45,7 @@ void install() {
 	Chat::install();
 	Camera::install();
 	Drawing::install();
+	WeaponPanel::install();
 }
 
 // Thanks StepS
