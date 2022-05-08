@@ -122,3 +122,11 @@ DWORD W2App::getAddrDdMain() {
 void W2App::setAddrDdMain(DWORD addrDdMain) {
 	addrDDMain = addrDdMain;
 }
+
+DWORD W2App::getAddrTurnGame() {
+	DWORD ddgame = getAddrDdGame();
+	if(ddgame) {
+		return *(DWORD*)(ddgame + 0x8);
+	}
+	return 0;
+}

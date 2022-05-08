@@ -34,6 +34,7 @@ public:
 	static DWORD getAddrGameinfoObject();
 	static DWORD getAddrW2Wrapper();
 	static DWORD getAddrGameGlobal();
+	static DWORD getAddrTurnGame();
 
 	static DWORD getAddrDdMain();
 

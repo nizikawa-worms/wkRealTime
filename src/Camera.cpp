@@ -8,6 +8,7 @@
 #include "Utils.h"
 #include "Debugf.h"
 #include "W2App.h"
+#include "src/entities/CTaskTurnGame.h"
 
 DWORD (__fastcall *origFixedCameraCenterAtObject)(DWORD posx, DWORD posy, CGameTask *object);
 DWORD __fastcall Camera::hookFixedCameraCenterAtObject(DWORD posx, DWORD posy, CGameTask *object) {
@@ -27,6 +28,10 @@ DWORD (__fastcall *origCameraLookAtMe)(DWORD posx, DWORD posy, CGameTask *object
 DWORD __fastcall hookCameraLookAtMe(DWORD posx, DWORD posy, CGameTask *object, int priority) {
 //	debugf("X: %lf Y: %lf Obj: 0x%X priority: %d\n", Utils::fixedToDouble(posx), Utils::fixedToDouble(posy), object, priority);
 	if(RealTime::isActive()) {
+		CTaskTurnGame * turnGame = (CTaskTurnGame*)W2App::getAddrTurnGame();
+		if(turnGame->its_before_round_start_dword140) {
+			return 0;
+		}
 		switch(object->classtype) {
 			case Constants::ClassType_Task_Team: {
 				CTaskTeam * team = (CTaskTeam*)object;
