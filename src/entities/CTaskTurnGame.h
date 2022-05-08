@@ -27,7 +27,7 @@ public:
 	int unknown70; // 0x70
 	int unknown74; // 0x74
 	int unknown78; // 0x78
-	int unknown7C; // 0x7C
+	int number_of_teams_dword7C; // 0x7C
 	int unknown80; // 0x80
 	int unknown84; // 0x84
 	int unknown88; // 0x88
@@ -80,7 +80,7 @@ public:
 	int unknown144; // 0x144
 	int unknown148; // 0x148
 	int unknown14C; // 0x14C
-	int unknown150; // 0x150
+	int turn_paused_dword150; // 0x150
 	int unknown154; // 0x154
 	int unknown158; // 0x158
 	int unknown15C; // 0x15C
@@ -90,7 +90,7 @@ public:
 	int unknown16C; // 0x16C
 	int unknown170; // 0x170
 	int unknown174; // 0x174
-	int unknown178; // 0x178
+	int retreat_timer_dword178; // 0x178
 	int unknown17C; // 0x17C
 	int unknown180; // 0x180
 	int round_timer_dword184; // 0x184
@@ -187,6 +187,8 @@ private:
 	static DWORD __stdcall hookSetActiveWorm();
 	static inline bool flagActivatingTeam = false;
 	static void spoofTeamMessage(CTaskTurnGame *This, const void *data, Constants::TaskMessage mtype);
+	static int __stdcall hookShouldPauseTurn();
+	void resetDamageTaken();
 public:
 	static void install();
 };
