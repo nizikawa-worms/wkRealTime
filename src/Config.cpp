@@ -22,6 +22,7 @@ void Config::readConfig() {
 
 	colorMod = GetPrivateProfileIntA("general", "ColorMod", 1, inipath.c_str());
 	ghosts = GetPrivateProfileIntA("general", "GhostWorms", 1, inipath.c_str());
+	ghosts = GetPrivateProfileIntA("general", "MuteOthers", 0, inipath.c_str());
 
 	devConsoleEnabled = GetPrivateProfileIntA("debug", "EnableDevConsole", 0, inipath.c_str());
 	hexDumpPackets = GetPrivateProfileIntA("debug", "HexDumpPackets", 0, inipath.c_str());
@@ -165,5 +166,13 @@ unsigned int Config::getGhosts() {
 
 void Config::setGhosts(unsigned int ghosts) {
 	Config::ghosts = ghosts;
+}
+
+unsigned int Config::getMuteOthers() {
+	return mute_others;
+}
+
+void Config::setMuteOthers(unsigned int mute_others) {
+	Config::mute_others = mute_others;
 }
 

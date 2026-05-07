@@ -1,10 +1,11 @@
 cmake_minimum_required(VERSION 3.17)
 project(wkRealTime
-        VERSION "0.0.9.0"
+        VERSION "0.0.9.1"
         DESCRIPTION "Real-time network multiplayer for racing schemes"
         )
 
 set(CMAKE_CXX_STANDARD 23)
+set(CMAKE_INTERPROCEDURAL_OPTIMIZATION ON)
 
 add_subdirectory(lib/hacklib-patternscanner)
 

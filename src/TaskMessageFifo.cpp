@@ -20,7 +20,7 @@ void TaskMessageFifo::printContents() {
 	int i = 0;
 	while(entry) {
 		DWORD size = entry->totalsize_dword0 - 4;
-		printf("\t%d: entry: 0x%08X tsize: %d size: %d, capacity_dword4: 0x%08X type: %d\n", i, (DWORD)entry, entry->totalsize_dword0, size, entry->nextentry_dword4, entry->type_dword8);
+		printf("\t%d: entry: 0x%08X tsize: %d size: %d, capacity_dword4: %p type: %d\n", i, (DWORD)entry, entry->totalsize_dword0, size, entry->nextentry_dword4, entry->type_dword8);
 		if(size) {
 			Utils::hexDump("Payload", entry->datac, size);
 		}

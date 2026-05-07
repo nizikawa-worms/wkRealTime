@@ -124,10 +124,80 @@ int CTaskWorm::callStartShootingNinjaRope(DWORD a2) {
 	return retv;
 }
 
+uintptr_t origWormUpdateJetpack;
+
+inline __declspec(naked) int callWormUpdateJetpack(CTaskWorm *_worm) {
+	__asm {
+			push ebp
+			mov ebp, esp
+
+			// ---- preserve non-volatiles ----
+			push ebx
+			push esi
+			push edi
+
+			mov edi, _worm
+			call origWormUpdateJetpack
+
+			// ---- restore non-volatiles ----
+			pop edi
+			pop esi
+			pop ebx
+
+			pop ebp
+			ret
+			}
+}
+
+int __stdcall implWormUpdateJetpack(CTaskWorm * worm) {
+	if (RealTime::isActive() && Config::getMuteOthers()) {
+		if (!worm->isOwnedByMe()) {
+			return 0;
+		}
+	}
+	return callWormUpdateJetpack(worm);
+}
+
+__declspec(naked) void hookWormUpdateJetpack() {
+	__asm {
+			// ---- save volatile register arguments ----
+			push edi // save a1
+
+			// ---- anchor stack base ----
+			mov edx, esp
+
+			// ---- save non-volatile registers ----
+			push ebx
+			push ebp
+			push esi
+			push edi
+
+			// ---- push stdcall arguments (right-to-left) ----
+			mov eax, [edx + 0x0]
+			push eax // a1 (from saved edi)
+
+			mov eax, implWormUpdateJetpack
+			call eax // stdcall (callee cleans)
+
+			// ---- restore non-volatile ----
+			pop edi
+			pop esi
+			pop ebp
+			pop ebx
+
+			// ---- discard volatile register arguments
+			add esp, 4
+			ret 0x0
+			}
+}
+
+
 void CTaskWorm::install() {
 	DWORD addrWormHandleMessage = _ScanPattern("CTaskWormHandleMessage", "\x55\x8B\xEC\x83\xE4\xF8\x81\xEC\x00\x00\x00\x00\x53\x8B\xD9\x8B\x83\x00\x00\x00\x00\x8B\x8B\x00\x00\x00\x00\x8B\x93\x00\x00\x00\x00\x89\x44\x24\x14\x8B\x83\x00\x00\x00\x00\x56\x8B\x75\x0C\x89\x44\x24\x08\x89\x4C\x24\x14\x8B\x8B\x00\x00\x00\x00\x8D\x46\xE2\x83\xF8\x15\x57", "??????xx????xxxxx????xx????xx????xxxxxx????xxxxxxxxxxxxxx????xxxxxxx");
 	addrStartShootingNinjaRope = _ScanPattern("StartShootingNinjaRope", "\x57\x8B\xF8\x8B\x4F\x2C\x8B\x81\x00\x00\x00\x00\x05\x00\x00\x00\x00\x83\xB9\x00\x00\x00\x00\x00\x75\x13\x83\xB9\x00\x00\x00\x00\x00\x75\x0A\xC7\x81\x00\x00\x00\x00\x00\x00\x00\x00\x83\xBF\x00\x00\x00\x00\x00\x75\x17", "??????xx????x????xx?????xxxx?????xxxx????????xx?????xx");
+	DWORD addrWormUpdateJetpack = _ScanPattern("WormUpdateJetpack", "\x8B\x87\x00\x00\x00\x00\x85\xC0\x56\x74\x00\x8B\xB7\x00\x00\x00\x00\x85\xF6\x75\x00\x8B\x4F\x00\x39\x71\x00\x74\x00\x85\xC0\x7C\x00\xA9\x00\x00\x00\x00\x74\x00\x8B\x49\x00\x8B\xD0\x81\xE2\x00\x00\x00\x00\xE8\x00\x00\x00\x00\x89\xB7\x00\x00\x00\x00\xEB\x00\x8B\x49\x00\x8B\x11\x50\x8B\x42\x00\xFF\xD0", "??????xxxx?xx????xxx?xx?xx?x?xxx?x????x?xx?xxxx????x????xx????x?xx?xxxxx?xx");
 	_HookDefault(WormHandleMessage);
+	_HookDefault(WormUpdateJetpack);
 }
 
 bool CTaskWorm::isOwnedByMe() {

@@ -26,7 +26,7 @@ int WaLibc::install() {
 	DWORD addrGetDataPath = _ScanPattern("GetDataPath", "\x6A\xFF\x68\x00\x00\x00\x00\x64\xA1\x00\x00\x00\x00\x50\x64\x89\x25\x00\x00\x00\x00\x83\xEC\x08\x53\x56\x8B\x74\x24\x20\x33\xDB\x89\x5C\x24\x18\x89\x5C\x24\x0C\xE8\x00\x00\x00\x00\x33\xC9", "???????xx????xxxx????xxxxxxxxxxxxxxxxxxxx????xx");
 	addrDriveLetter = *(char**)(addrGetDataPath + 0x69);
 	addrSteamFlag = *(char**)(addrGetDataPath + 0x56);
-	debugf("addrDriveLetter: 0x%X addrSteamFlag: 0x%X\n", addrDriveLetter, addrSteamFlag);
+	debugf("addrDriveLetter: %p addrSteamFlag: %p\n", addrDriveLetter, addrSteamFlag);
 
 	DWORD addrWaFopenRef = _ScanPattern("WaFopenRef", "\x81\xEC\x00\x00\x00\x00\x68\x00\x00\x00\x00\x50\xE8\x00\x00\x00\x00\x83\xC4\x08\x85\xC0\x89\x44\x24\x14\x0F\x84\x00\x00\x00\x00\x0F\xB7\x06", "??????x????xx????xxxxxxxxxxx????xxx");
 	DWORD addrWaFopen = *(DWORD*)(addrWaFopenRef + 0xD) + addrWaFopenRef + 0x11;

@@ -8,11 +8,9 @@
 #include "Utils.h"
 #include <json.hpp>
 #include <format>
-#include <polyhook2/CapstoneDisassembler.hpp>
 
 
 void Hooks::hook(std::string name, DWORD pTarget, DWORD *pDetour, DWORD *ppOriginal, const char * line) {
-	static PLH::CapstoneDisassembler dis(PLH::Mode::x86);
 	if(!pTarget)
 		throw std::runtime_error("Hook adress is null: " + name);
 	if(hookNameToAddr.find(name) != hookNameToAddr.end())
@@ -24,7 +22,7 @@ void Hooks::hook(std::string name, DWORD pTarget, DWORD *pDetour, DWORD *ppOrigi
 	}
 
 	uint64_t trampoline = 0;
-	auto detour = std::make_unique<PLH::x86Detour>(pTarget, (const uint64_t)pDetour, &trampoline, dis, polyhook_maxDepth);
+	auto detour = std::make_unique<PLH::x86Detour>(pTarget, (const uint64_t)pDetour, &trampoline);
 	if(!detour->hook()) {
 		throw std::runtime_error("Failed to create hook: " + name);
 	}
@@ -34,14 +32,13 @@ void Hooks::hook(std::string name, DWORD pTarget, DWORD *pDetour, DWORD *ppOrigi
 	hookAddrToName[pTarget] = name;
 	hookNameToAddr[name] = pTarget;
 	if(!line) {
-		debugf("%s 0x%X -> 0x%X\n", name.c_str(), pTarget, pDetour);
+		debugf("%s 0x%X -> %p\n", name.c_str(), pTarget, pDetour);
 	} else {
-		printf("%s: hook: %s 0x%X -> 0x%X\n", line, name.c_str(), pTarget, pDetour);
+		printf("%s: hook: %s 0x%X -> %p\n", line, name.c_str(), pTarget, pDetour);
 	}
 }
 
-void Hooks::hookIat(std::string dllName, std::string apiName, DWORD *pDetour, DWORD *ppOriginal) {
-	static PLH::CapstoneDisassembler dis(PLH::Mode::x86);
+void Hooks::hookIat(std::string dllName, std::string apiName, DWORD *pDetour, DWORD *ppOriginal) {;
 	uint64_t trampoline = 0;
 	const std::wstring module;
 	auto hook = std::make_unique<PLH::IatHook>(dllName, apiName, (const uint64_t)pDetour, &trampoline, module);
@@ -50,7 +47,7 @@ void Hooks::hookIat(std::string dllName, std::string apiName, DWORD *pDetour, DW
 	}
 	*ppOriginal = (DWORD)trampoline;
 	iathooks.push_back(std::move(hook));
-	debugf("%s::%s -> 0x%X\n", dllName.c_str(), apiName.c_str(), pDetour);
+	debugf("%s::%s -> %p\n", dllName.c_str(), apiName.c_str(), pDetour);
 }
 
 

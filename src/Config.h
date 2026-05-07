@@ -26,6 +26,7 @@ private:
 	static inline bool logToFile = false;
 	static inline int colorMod = 0;
 	static inline unsigned int ghosts = 0;
+	static inline unsigned int mute_others = 0;
 public:
 
 	static void readConfig();
@@ -57,6 +58,9 @@ public:
 
 	static unsigned int getGhosts();
 	static void setGhosts(unsigned int ghosts);
+
+	static unsigned int getMuteOthers();
+	static void setMuteOthers(unsigned int mute_others);
 };
 
 

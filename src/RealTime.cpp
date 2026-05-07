@@ -46,6 +46,18 @@ int RealTime::onChatInput(std::vector<std::string> &parts) {
 				Chat::callShowChatMessage(std::format("GhostWorms: {}", e.what()), 6);
 			}
 		}
+		if(parts[0] == "/mute_others") {
+			try {
+				int choice = std::stoi(parts[1]);
+				if(choice >= 0 && choice <= 1) {
+					Config::setMuteOthers(choice);
+					Chat::callShowChatMessage(std::format("Mute others: {}", Config::getMuteOthers()), 6);
+					return 1;
+				} else throw std::runtime_error(std::format("Unknown choice: {}", choice));
+			} catch(std::exception & e) {
+				Chat::callShowChatMessage(std::format("Mute others: {}", e.what()), 6);
+			}
+		}
 		if(parts[0] == "/follow") {
 			try {
 				int choice = std::stoi(parts[1]);
